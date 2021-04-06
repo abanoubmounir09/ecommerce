@@ -1,0 +1,12 @@
+
+
+1-install env:
+sudo pip install virtualenv
+
+2-active env:
+.\newenv\Scripts\activate
+
+3-instal django:
+python -m pip install Django
+
+4-deactivate
