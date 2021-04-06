@@ -1,7 +1,7 @@
 
 
 1-install env:
-sudo pip install virtualenv
+ pip install virtualenv
 
 2-active env:
 .\newenv\Scripts\activate

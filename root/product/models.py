@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
+import datetime
 # Create your models here.
 
 
@@ -13,7 +13,7 @@ class Product(models.Model):
     PRDPrice = models.DecimalField(max_digits=5  , decimal_places=2 , verbose_name=_("Price"))
     PRDDiscountPrice = models.DecimalField(max_digits=5  , decimal_places=2 , verbose_name=_("Discount Price"))    
     PRDCost = models.DecimalField(max_digits=5 , decimal_places=2 , verbose_name=_("Cost"))
-    PRDCreated = models.DateTimeField(verbose_name=_("Created At"))
+    PRDCreatedNow = models.DateTimeField(auto_now_add=True,verbose_name=_("Created in"))
     
     def __str__(self):
         return self.PRDName
@@ -41,5 +41,11 @@ class Category(models.Model):
     def __str__(self):
         return self.CATName
 
+
+"""
+class oOrder(models.Model):
+    # user forien key 
+    # product forien key
+"""
 
 
