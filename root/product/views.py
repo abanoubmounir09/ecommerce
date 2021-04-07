@@ -90,7 +90,9 @@ def addtocard(request):
 
 
 
-           
+def showproduct(request):
+    obj=Product.objects.all()
+    return render(request,'home.html',{'data':obj})
 
     
    
