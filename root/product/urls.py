@@ -16,9 +16,7 @@ urlpatterns = [
     path('snippets/', views.snippet_list,name="snippet_list"),
     path('categories/', views.category_list,name="category_list"),
     path('snippets/<int:pk>/', views.snippet_list_item,name="snippet_item"),
-    path('home/',views.home,name="home"),
-    path('addproduct/',views.addproduct,name="addproduct"),    
-    path('getcarditem/',views.getcarditem,name="getcarditem"),   
+    path('home/',views.home,name="home"), 
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

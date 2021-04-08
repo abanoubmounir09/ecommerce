@@ -106,11 +106,15 @@ def addtocard(request):
     #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def getcarditem(request):
-    query= Order.objects.filter(Orderuser__id=1)
-    print("*****************",query)
-    return HttpResponse(query)
+# def getcarditem(request):
+#     query= Order.objects.filter(Orderuser__id=1)
+#     print("*****************",query)
+#     return HttpResponse(query)
            
+
+# def showproduct(request):
+#     obj=Product.objects.all()
+#     return render(request,'home.html',{'data':obj})
 
     
    
