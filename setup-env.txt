@@ -10,3 +10,8 @@
 python -m pip install Django
 
 4-deactivate
+
+----------------------------
+Header set Access-Control-Allow-Origin 'http://localhost:4200'​
+Header always set Access-Control-Allow-Methods "POST, GET, DELETE, PUT"
+Header always set Access-Control-Allow-Headers "*"
