@@ -1,15 +1,15 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse,Http404
 from django.core.paginator import Paginator
-from django.contrib.auth.models import User
 
-from .models import Product,Category,Order
+from .models import Product,Category
 from .forms import addproductform
 
 #serialize
-from .serializers import productSerializer,categorySerializer
+from .serializers import productSerializer, categorySerializer
 from rest_framework import viewsets
 from rest_framework import permissions
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -17,43 +17,31 @@ from rest_framework.response import Response
 
 
 #create class 
-#class productViewSet(viewsets.ModelViewSet):
-   # queryset = Product.objects.all()
-    #serializer_class = productSerializer
+class productViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = productSerializer
     #permission_classes = [permissions.IsAuthenticated]
 
 # create get all api
-@api_view(['GET'])
-def snippet_list(request):
-    # if request.method == 'GET':
-    snippets = Product.objects.all()
-    paginator = Paginator(snippets, 2) 
-    page = request.GET.get('page')
-    product_list = paginator.get_page(page)
-    # context = {'product_list' : product_list}
-    serializer = productSerializer(product_list,many=True)
-    # x = ("product_list", product_list)
-    # serializer.data.append(x)
-    # print("*******************",serializer.data)
-    return Response(serializer.data)
-
-
-
-# create get api
 @api_view(['GET', 'POST'])
-def snippet_list_item(request,pk):
+def snippet_list(request):
     if request.method == 'GET':
-        snippets = Product.objects.filter(id=pk)
+        snippets = Product.objects.all()
         serializer = productSerializer(snippets, many=True)
         return Response(serializer.data)
 
-# create get api categories
+# create get api
 @api_view(['GET', 'POST'])
-def category_list(request):
-    if request.method == 'GET':
-        snippets = Category.objects.all()
-        serializer = categorySerializer(snippets, many=True)
-        return Response(serializer.data)
+def snippet_list_item(request,cat,name):
+    snippets = Product.objects.filter(PRDCategory__CATName=cat,PRDName=name)
+    serializer = productSerializer(snippets, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET', 'POST'])
+def productbyid(request,id):
+    snippets = Product.objects.filter(id=id)
+    serializer = productSerializer(snippets, many=True)
+    return Response(serializer.data)
 
 
 
@@ -61,8 +49,8 @@ def category_list(request):
 # Create your views here.
 def home(request):
     list_samsung = Product.objects.filter(PRDCategory__CATName='samsung')
-
     paginator = Paginator(list_samsung, 2) # Show 10 contacts per page.
+    
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -106,17 +94,19 @@ def addtocard(request):
     #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# def getcarditem(request):
-#     query= Order.objects.filter(Orderuser__id=1)
-#     print("*****************",query)
-#     return HttpResponse(query)
-           
 
-# def showproduct(request):
-#     obj=Product.objects.all()
-#     return render(request,'home.html',{'data':obj})
+def showproduct(request):
+    obj=Product.objects.all()
+    return render(request,'home.html',{'data':obj})
 
-    
-   
+
+# create get api categories
+@api_view(['GET', 'POST'])
+def category_list(request):
+    if request.method == 'GET':
+        snippets = Category.objects.all()
+        serializer = categorySerializer(snippets, many=True)
+        return Response(serializer.data)
+
 
 

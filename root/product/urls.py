@@ -15,7 +15,8 @@ urlpatterns = [
     #path('',include(router.urls)),
     path('snippets/', views.snippet_list,name="snippet_list"),
     path('categories/', views.category_list,name="category_list"),
-    path('snippets/<int:pk>/', views.snippet_list_item,name="snippet_item"),
+    path('snippets/<str:cat>/<str:name>/', views.snippet_list_item,name="snippet_item"),
+    path('prdid/<int:id>/', views.productbyid,name="productbyid"),
     path('home/',views.home,name="home"), 
 ]
 if settings.DEBUG:
