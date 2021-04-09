@@ -5,6 +5,7 @@ from django.core.paginator import Paginator
 from .models import Product,Category
 from .forms import addproductform
 
+
 #serialize
 from .serializers import productSerializer, categorySerializer
 from rest_framework import viewsets
@@ -13,22 +14,34 @@ from rest_framework import permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-# test for all parameters
-@api_view(['GET'])
-def query_test(request,cat="",name="",price=0):
-    arr=[]
-    query=""
-    if(cat != ""):
-        
-        arr.append(cat)
-    if(name != ""):
-        arr.append(name)
-    if(price > 0):
-        arr.append(price)
-    
-    
+import json
+from django.http import HttpResponse
+from django.db.models import Q
 
-    return HttpResponse(query)
+# test for all parameters
+@api_view(['POST'])
+def query_test(request):
+    if request.method == 'POST':
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        category = body['category'] #select items from dictionary by name
+        prodname= body['Prodname'] 
+        priceSTR = body['price'] 
+        prictInt = int(priceSTR)
+        query = Q()
+        queryset = Product.objects.all()
+        if(category):
+            query = Product.objects.filter(PRDCategory__CATName=category)
+        if(prodname):
+            query &=Product.objects.filter(PRDName=prodname)
+        if(prictInt > 0):
+            query &=Product.objects.filter(PRDPrice=price)
+        print(query)
+      
+        # print("**********************",body)
+        # print("******name is*********",category)
+        return HttpResponse("call success in django ")
+
 
     # snippets = Product.objects.filter(PRDCategory__CATName=cat,PRDName=name)
     # serializer = productSerializer(snippets, many=True)

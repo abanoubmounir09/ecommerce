@@ -17,11 +17,7 @@ urlpatterns = [
     path('categories/', views.category_list,name="category_list"),
     path('query/<str:cat>/<str:name>/', views.query_list,name="query_list"),
     path('prdid/<int:id>/', views.productbyid,name="productbyid"),
-
-    path('check/<str:cat>/<str:name>/<int:price>/', views.query_test,name="query_test"),
-    path('check/<str:cat>/<str:name>/', views.query_test,name="query_test"),
-    path('check/<str:cat>/', views.query_test,name="query_test"),
-
+    path('test/', views.query_test,name="query_test"),
     path('home/',views.home,name="home"), 
 ]
 if settings.DEBUG:
