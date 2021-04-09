@@ -16,7 +16,7 @@ from rest_framework.response import Response
 
 
 
-#create class 
+#create class
 class productViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = productSerializer
@@ -45,7 +45,7 @@ def snippet_list_item(request,pk):
 def home(request):
     list_samsung = Product.objects.filter(PRDCategory__CATName='samsung')
     paginator = Paginator(list_samsung, 2) # Show 10 contacts per page.
-    
+
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -81,6 +81,14 @@ def addtocard(request):
 
 """
 
+#function to display product details
+"""
+def product_details(request):
+    products=Product.objects.get(id=productid)
+    return render(request,"detail.html",{'products':products})
+    """
+
+
     # elif request.method == 'POST':
     #     serializer = SnippetSerializer(data=request.data)
     #     if serializer.is_valid():
@@ -93,8 +101,3 @@ def addtocard(request):
 def showproduct(request):
     obj=Product.objects.all()
     return render(request,'home.html',{'data':obj})
-
-    
-   
-
-
