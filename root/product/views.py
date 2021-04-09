@@ -47,6 +47,14 @@ def query_test(request):
     # serializer = productSerializer(snippets, many=True)
     # return Response(serializer.data)
 
+<<<<<<< HEAD
+#create class
+class productViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = productSerializer
+    #permission_classes = [permissions.IsAuthenticated]
+=======
+>>>>>>> 9eb3b6dc51ec5e984a5a34ad6cb717491e2c2fc6
 
 # create get all api
 @api_view(['GET', 'POST'])
@@ -87,6 +95,10 @@ def category_list(request):
 def home(request):
     list_samsung = Product.objects.filter(PRDCategory__CATName='samsung')
     paginator = Paginator(list_samsung, 2) # Show 10 contacts per page.
+<<<<<<< HEAD
+
+=======
+>>>>>>> 9eb3b6dc51ec5e984a5a34ad6cb717491e2c2fc6
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -122,6 +134,14 @@ def addtocard(request):
 
 """
 
+#function to display product details
+"""
+def product_details(request):
+    products=Product.objects.get(id=productid)
+    return render(request,"detail.html",{'products':products})
+    """
+
+
     # elif request.method == 'POST':
     #     serializer = SnippetSerializer(data=request.data)
     #     if serializer.is_valid():
@@ -134,9 +154,12 @@ def addtocard(request):
 def showproduct(request):
     obj=Product.objects.all()
     return render(request,'home.html',{'data':obj})
+<<<<<<< HEAD
+=======
 
 
 
 
 
 
+>>>>>>> 9eb3b6dc51ec5e984a5a34ad6cb717491e2c2fc6
