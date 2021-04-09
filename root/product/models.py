@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 import datetime
+from django.contrib.auth.models import User
 # Create your models here.
 
 
@@ -42,10 +43,10 @@ class Category(models.Model):
         return self.CATName
 
 
-"""
-class oOrder(models.Model):
-    # user forien key 
-    # product forien key
-"""
+class Order(models.Model):
+     Orderuser = models.ForeignKey(User , on_delete=models.CASCADE , verbose_name=_("userref"),blank=True, null=True)
+     Orderproduct = models.ForeignKey(Product , on_delete=models.CASCADE, verbose_name=_("productref"), blank=True, null=True )
+     
 
+     
 
