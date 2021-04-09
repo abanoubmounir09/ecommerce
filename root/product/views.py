@@ -13,44 +13,67 @@ from rest_framework import permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+# test for all parameters
+@api_view(['GET'])
+def query_test(request,cat="",name="",price=0):
+    arr=[]
+    query=""
+    if(cat != ""):
+        
+        arr.append(cat)
+    if(name != ""):
+        arr.append(name)
+    if(price > 0):
+        arr.append(price)
+    
+    
 
+    return HttpResponse(query)
 
+    # snippets = Product.objects.filter(PRDCategory__CATName=cat,PRDName=name)
+    # serializer = productSerializer(snippets, many=True)
+    # return Response(serializer.data)
 
-#create class 
-class productViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = productSerializer
-    #permission_classes = [permissions.IsAuthenticated]
 
 # create get all api
 @api_view(['GET', 'POST'])
 def snippet_list(request):
     if request.method == 'GET':
         snippets = Product.objects.all()
-        serializer = productSerializer(snippets, many=True)
+
+        paginator = Paginator(snippets, 2) # Show 25 contacts per page.
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        serializer = productSerializer(page_obj, many=True)
         return Response(serializer.data)
 
 # create get api
 @api_view(['GET', 'POST'])
-def snippet_list_item(request,cat,name):
+def query_list(request,cat,name):
     snippets = Product.objects.filter(PRDCategory__CATName=cat,PRDName=name)
     serializer = productSerializer(snippets, many=True)
     return Response(serializer.data)
 
-@api_view(['GET', 'POST'])
+# create get product by id
+@api_view(['GET'])
 def productbyid(request,id):
     snippets = Product.objects.filter(id=id)
     serializer = productSerializer(snippets, many=True)
     return Response(serializer.data)
 
-
-
+# create get api categories
+@api_view(['GET', 'POST'])
+def category_list(request):
+    if request.method == 'GET':
+        snippets = Category.objects.all()
+        serializer = categorySerializer(snippets, many=True)
+        return Response(serializer.data)
 
 # Create your views here.
 def home(request):
     list_samsung = Product.objects.filter(PRDCategory__CATName='samsung')
     paginator = Paginator(list_samsung, 2) # Show 10 contacts per page.
-    
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -100,13 +123,7 @@ def showproduct(request):
     return render(request,'home.html',{'data':obj})
 
 
-# create get api categories
-@api_view(['GET', 'POST'])
-def category_list(request):
-    if request.method == 'GET':
-        snippets = Category.objects.all()
-        serializer = categorySerializer(snippets, many=True)
-        return Response(serializer.data)
+
 
 
 
