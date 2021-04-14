@@ -1,19 +1,14 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse,Http404
 from django.core.paginator import Paginator
-
-from .models import Product,Category
+from .models import Product,Category,Rating
 from .forms import addproductform
-
-
 #serialize
 from .serializers import productSerializer, categorySerializer
 from rest_framework import viewsets
 from rest_framework import permissions
-
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
 import json
 from django.http import HttpResponse
 from django.db.models import Q
@@ -26,46 +21,43 @@ def query_test(request):
         body = json.loads(body_unicode)
         category = body['category'] #select items from dictionary by name
         prodname= body['Prodname'] 
+        # print("*******category*********",category)
         priceSTR = body['price'] 
-        prictInt = int(priceSTR)
+        # prictInt:int; 
         query = Q()
-        queryset = Product.objects.all()
-        if(category):
-            query = Product.objects.filter(PRDCategory__CATName=category)
-        if(prodname):
-            query &=Product.objects.filter(PRDName=prodname)
-        if(prictInt > 0):
-            query &=Product.objects.filter(PRDPrice=price)
-        print(query)
-      
-        # print("**********************",body)
-        # print("******name is*********",category)
-        return HttpResponse("call success in django ")
+        query= Product.objects.all()
+        if(category!=""):
+            qtest= Product.objects.filter(Q(PRDCategory__CATName=category))
+            if(len(qtest)!= 0):
+                query &= qtest
+        if(prodname!=""):
+            qtest= Product.objects.filter(Q(PRDName=prodname))
+            if(len(qtest)!= 0):
+                query &=qtest 
 
+        if(int(priceSTR) > 0):
+            prictInt=int(priceSTR)
+            qtest= Product.objects.filter(Q(PRDPrice=prictInt))
+            if(len(qtest)!= 0):
+                query &=qtest
+        
+        if (len(query) == 0):
+            query=Product.objects.all()
+        print("****len(query)*****",len(query))
+        print("****data(query)*****",query)
+        snippets = query
+        serializer = productSerializer(snippets, many=True)
+        return Response(serializer.data)
 
-    # snippets = Product.objects.filter(PRDCategory__CATName=cat,PRDName=name)
-    # serializer = productSerializer(snippets, many=True)
-    # return Response(serializer.data)
-
-<<<<<<< HEAD
-#create class
-class productViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = productSerializer
-    #permission_classes = [permissions.IsAuthenticated]
-=======
->>>>>>> 9eb3b6dc51ec5e984a5a34ad6cb717491e2c2fc6
 
 # create get all api
 @api_view(['GET', 'POST'])
 def snippet_list(request):
     if request.method == 'GET':
         snippets = Product.objects.all()
-
         paginator = Paginator(snippets, 2) # Show 25 contacts per page.
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
-
         serializer = productSerializer(page_obj, many=True)
         return Response(serializer.data)
 
@@ -76,10 +68,11 @@ def query_list(request,cat,name):
     serializer = productSerializer(snippets, many=True)
     return Response(serializer.data)
 
-# create get product by id
+# create get product-details by id
 @api_view(['GET'])
 def productbyid(request,id):
     snippets = Product.objects.filter(id=id)
+    #another query retuen rating from table Rating
     serializer = productSerializer(snippets, many=True)
     return Response(serializer.data)
 
@@ -95,10 +88,7 @@ def category_list(request):
 def home(request):
     list_samsung = Product.objects.filter(PRDCategory__CATName='samsung')
     paginator = Paginator(list_samsung, 2) # Show 10 contacts per page.
-<<<<<<< HEAD
 
-=======
->>>>>>> 9eb3b6dc51ec5e984a5a34ad6cb717491e2c2fc6
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -124,6 +114,20 @@ def addproduct(request):
          form = addproductform()
          return render(request,'new_product.html',{'form':form})
 
+
+
+
+#get ratingItem for item 
+def ratingItem(request,id):
+    query = Rating.objects.filter(RATProduct__pk=id)
+    sum = 0
+    for item in query:
+        sum += item.stars
+    print(sum)
+    return HttpResponse("sum is ="+ str(sum))
+    
+#get rating from product for item >>
+# def 
 
 """
 @login
@@ -154,12 +158,9 @@ def product_details(request):
 def showproduct(request):
     obj=Product.objects.all()
     return render(request,'home.html',{'data':obj})
-<<<<<<< HEAD
-=======
 
 
 
 
 
 
->>>>>>> 9eb3b6dc51ec5e984a5a34ad6cb717491e2c2fc6

@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -42,13 +41,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'product',
-<<<<<<< HEAD
     'accounts',
-=======
     'corsheaders',
->>>>>>> 9eb3b6dc51ec5e984a5a34ad6cb717491e2c2fc6
     'rest_framework',
+    'rest_framework.authtoken',
+    'knox',
 ]
+# AUTH_USER_MODEL= 'accounts.Account'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -59,9 +58,26 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    
+    'django.middleware.common.CommonMiddleware', 
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # 'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        'knox.auth.TokenAuthentication',
+    ]
+}
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_PARSER_CLASSES': (
+#         'rest_framework.parsers.FormParser',
+#         'rest_framework.parsers.MultiPartParser',
+#         'knox.auth.TokenAuthentication',
+#      )
+#  }
+
+
 
 CORS_ORIGIN_ALLOW_ALL = True 
 CORS_ALLOW_CREDENTIALS = True
@@ -69,6 +85,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (
   'http://localhost:8000',
 )
+
+
 # CORS_ORIGIN_WHITELIST = [
 #     'http://localhost:4200',
 # ] # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
@@ -103,11 +121,13 @@ WSGI_APPLICATION = 'root.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+    'default': {
+        #'ENGINE': 'django.db.backends.sqlite3',
+        #'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'finaldb',
-        'USER': 'postgres',
-        'PASSWORD': 'root',
+        'USER': 'root',
+        'PASSWORD': '',
         'HOST': 'localhost',
     }
 }
@@ -158,4 +178,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR , 'media')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
 LOGIN_REDIRCT_URL='home'
+# LOGIN_URL = 'login'

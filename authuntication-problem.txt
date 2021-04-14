@@ -1,0 +1,14 @@
+1-add:
+WSGIPassAuthorization On
+
+2-
+INSTALLED_APPS = [
+    ...
+    'rest_framework.authtoken'
+]
+
+3-in view
+from rest_framework.authtoken.models import Token
+
+token = Token.objects.create(user=...)
+print(token.key)

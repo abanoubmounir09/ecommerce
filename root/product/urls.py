@@ -18,7 +18,8 @@ urlpatterns = [
     path('query/<str:cat>/<str:name>/', views.query_list,name="query_list"),
     path('prdid/<int:id>/', views.productbyid,name="productbyid"),
     path('test/', views.query_test,name="query_test"),
-    path('home/',views.home,name="home"), 
+    path('home/',views.home,name="home"),
+    path('rate/<int:id>/',views.ratingItem,name="ratingItem"), 
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

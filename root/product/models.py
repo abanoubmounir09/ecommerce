@@ -2,11 +2,13 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 import datetime
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator, MinValueValidator
 # Create your models here.
 
 
 class Product(models.Model):
     PRDName = models.CharField(max_length=100 , verbose_name=_("Product Name "))
+    PRDRate = models.ForeignKey('Rating' , on_delete=models.CASCADE ,blank=True, null=True , verbose_name=_("PRDRate"))
     PRDCategory = models.ForeignKey('Category' , on_delete=models.CASCADE , blank=True, null=True ,verbose_name=_("Category "))
     #PRDBrand = models.ForeignKey('settings.Brand' , on_delete=models.CASCADE , blank=True, null=True ,verbose_name=_("Brand "))
     PRDDesc = models.TextField(verbose_name=_("Description"))
@@ -49,4 +51,16 @@ class Order(models.Model):
      
 
      
+class Rating(models.Model):
+    RATProduct = models.ForeignKey(Product , on_delete=models.CASCADE , verbose_name=_("RATEProduct"))
+    RATUser = models.ForeignKey(User ,on_delete=models.CASCADE , verbose_name=_("RATEUser"))
+    stars = models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)])
+    # def __str__(self):
+    #     return str(self.RATProduct__PRDName)
 
+
+#table between owner and product
+class OwnerProduct(models.Model):
+    OwnerUser=models.ForeignKey(User ,on_delete=models.CASCADE , verbose_name=_("OwnerUser"))
+    OwnerProduct = models.ForeignKey(Product , on_delete=models.CASCADE , verbose_name=_("OwnerProduct"))
+    OwnerQuantity = models.IntegerField(Product)
