@@ -19,8 +19,14 @@ urlpatterns = [
     path('prdid/<int:id>/', views.productbyid,name="productbyid"),
     path('test/', views.query_test,name="query_test"),
     path('home/',views.home,name="home"),
+<<<<<<< HEAD
     path('rate/<str:id>/',views.rate_product,name="ratingItem"), 
    
+=======
+    path('add/',views.addp,name="add"),
+    path('order/',views.addtocard,name="order"),
+    path('rate/<int:id>/',views.ratingItem,name="ratingItem"), 
+>>>>>>> 18ca651dcd4ed33a7434a0feb0a1934e9107832a
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

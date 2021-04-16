@@ -13,9 +13,9 @@ class Product(models.Model):
     #PRDBrand = models.ForeignKey('settings.Brand' , on_delete=models.CASCADE , blank=True, null=True ,verbose_name=_("Brand "))
     PRDDesc = models.TextField(verbose_name=_("Description"))
     PRDImage = models.ImageField(upload_to='prodcut/' , verbose_name=_("Image") , blank=True, null=True)
-    PRDPrice = models.DecimalField(max_digits=5  , decimal_places=2 , verbose_name=_("Price"))
-    PRDDiscountPrice = models.DecimalField(max_digits=5  , decimal_places=2 , verbose_name=_("Discount Price"))    
-    PRDCost = models.DecimalField(max_digits=5 , decimal_places=2 , verbose_name=_("Cost"))
+    PRDPrice = models.FloatField( verbose_name=_("Price"))
+    PRDDiscountPrice = models.FloatField(   verbose_name=_("Discount Price"))
+    PRDCost = models.FloatField(  verbose_name=_("Cost"))
     PRDCreatedNow = models.DateTimeField(auto_now_add=True,verbose_name=_("Created in"))
     
     def __str__(self):
@@ -63,14 +63,18 @@ class Category(models.Model):
 
 
 class Order(models.Model):
-     Orderuser = models.ForeignKey(User , on_delete=models.CASCADE , verbose_name=_("userref"),blank=True, null=True)
      Orderproduct = models.ForeignKey(Product , on_delete=models.CASCADE, verbose_name=_("productref"), blank=True, null=True )
+<<<<<<< HEAD
      
 
 
 
 
 
+=======
+     order_user=models.ForeignKey(User, on_delete=models.CASCADE , blank=True, null=True)
+     
+>>>>>>> 18ca651dcd4ed33a7434a0feb0a1934e9107832a
 class Rating(models.Model):
     RATProduct = models.ForeignKey(Product , on_delete=models.CASCADE , verbose_name=_("RATEProduct"))
     RATUser = models.ForeignKey(User ,on_delete=models.CASCADE , verbose_name=_("RATEUser"))
