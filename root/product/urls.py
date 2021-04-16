@@ -19,6 +19,8 @@ urlpatterns = [
     path('prdid/<int:id>/', views.productbyid,name="productbyid"),
     path('test/', views.query_test,name="query_test"),
     path('home/',views.home,name="home"),
+    path('add/',views.addp,name="add"),
+    path('order/',views.addtocard,name="order"),
     path('rate/<int:id>/',views.ratingItem,name="ratingItem"), 
 ]
 if settings.DEBUG:

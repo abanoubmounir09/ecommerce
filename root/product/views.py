@@ -1,8 +1,9 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse,Http404
 from django.core.paginator import Paginator
-from .models import Product,Category,Rating
+from .models import Product,Category,Rating,Order
 from .forms import addproductform
+from django.contrib.auth.models import User
 #serialize
 from .serializers import productSerializer, categorySerializer
 from rest_framework import viewsets
@@ -160,7 +161,43 @@ def showproduct(request):
     return render(request,'home.html',{'data':obj})
 
 
+#tiger
+@api_view(['GET', 'POST'])
+def addp(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    PRDName=body['PRDName']
+    PRDCategory = body['PRDCategory']
+    PRDDesc = body['PRDDesc']
+    PRDImage = body['PRDImage']
+    PRDPrice = body['PRDPrice']
+    PRDDiscountPrice = body['PRDDiscountPrice']
+    PRDCost = body['PRDCost']
+
+    obj=Product()
+    obj.PRDName=PRDName
+    obj.PRDCategory__CATName = PRDCategory
+    obj.PRDDesc = PRDDesc
+    obj.PRDImage = PRDImage
+    obj.PRDPrice = PRDPrice
+    obj.PRDDiscountPrice = PRDDiscountPrice
+    obj.PRDCost = PRDCost
+    obj.save()
+    return HttpResponse("productadd")
 
 
+#tiger
+@api_view(['GET', 'POST'])
+def addtocard(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    id = body['pid']
+    uid=body['uid']
+    userobj=User.objects.get(id=uid)
+    objproduct=Product.objects.get(id=id)
+    objorder=Order()
+    objorder.order_user=userobj
 
-
+    objorder.Orderproduct=objproduct
+    objorder.save()
+    return HttpResponse("oederdone")
