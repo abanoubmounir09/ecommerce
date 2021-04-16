@@ -6,8 +6,11 @@ from .forms import addproductform
 #serialize
 from .serializers import productSerializer, categorySerializer
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework import permissions
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.response import Response
 import json
 from django.http import HttpResponse
@@ -25,7 +28,7 @@ def query_test(request):
         priceSTR = body['price'] 
         # prictInt:int; 
         query = Q()
-        query= Product.objects.all()
+        query=Product.objects.all()
         if(category!=""):
             qtest= Product.objects.filter(Q(PRDCategory__CATName=category))
             if(len(qtest)!= 0):
@@ -163,4 +166,34 @@ def showproduct(request):
 
 
 
+# rating function 
+#@action(detail=True,method=['POST'])
+@api_view(['POST'])
+def rate_product(request,id=None):
+    print('***************',request.data)   
+    if 'stars' in request.data:
+        product=Product.objects.filter(id=id)
+        stars= request.data['stars']
+        #user = request.user
+        user =User.objects.get(id=1)
+        print('user',user)
+        try:
+            rating = Rating.objects.get(user=user.id ,prodcut=prodcut.id)
+            rating.stars = stars
+            rating.save()
+            serializer=RatingSerializer(rating,many=False)
+            response={'message':'Rating Updated','result':serializer.data}
+            return Response(response,status=status.HTTP_200_OK)
+           
 
+        except:
+            rating = Rating.objects.create(user=user,prodcut=prodcut,stars=stars)
+            serializer=RatingSerializer(rating,many=False)
+            response={'message':'Rating Created','result':serializer.data}
+            return Response(response,status=status.HTTP_200_OK)
+
+
+       
+    else:
+        response={'message':'You need to provide stars'}
+        return Response(response,status=status.HTTP_400_BAD_REQUEST)
