@@ -32,8 +32,8 @@ class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        print("request.data++++++++++++++++++",request.data)
-        print("serializer++++++++++++++++++",serializer)
+        # print("request.data++++++++++++++++++",request.data)
+        # print("serializer++++++++++++++++++",serializer)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         if request.data['is_staff'] == "true":
@@ -49,14 +49,13 @@ class LoginAPI(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
     def post(self, request, format=None):
         serializer = AuthTokenSerializer(data=request.data)
+        print("*****AuthTokenSerializer///////---",serializer)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         activeuser=User.objects.get(username=user.username)
-        print("*****11111****staff****",activeuser.is_staff)
         datatest={}
         datatest['is_staff']=activeuser.is_staff
         login(request, user)
-        print("*****requ****staff****",request.data)
         temp_list=super(LoginAPI, self).post(request, format=None)
         temp_list.data["is_staff"]=activeuser.is_staff
         temp_list.data["email"]=activeuser.email

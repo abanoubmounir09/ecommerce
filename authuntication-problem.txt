@@ -12,3 +12,8 @@ from rest_framework.authtoken.models import Token
 
 token = Token.objects.create(user=...)
 print(token.key)
+
+---------------
+pip install django-cors-headers
+pip install djangorestframework
+pip install django-rest-knox
