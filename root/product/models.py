@@ -21,6 +21,23 @@ class Product(models.Model):
     def __str__(self):
         return self.PRDName
 
+
+    def no_of_rating(self):
+        ratings=Rating.objects.filter(RATProduct=self)
+        return len(ratings)
+
+
+    def avg_of_rating(self):
+        sum=0
+        ratings=Rating.objects.filter(RATProduct=self)
+        for rating in ratings:
+            sum+=rating.stars
+            if len(ratings)>0:
+                return sum/len(ratings)
+            else:
+                return 0
+
+
 #----------------------------------------
 
 class ProductImage(models.Model):
@@ -47,6 +64,12 @@ class Category(models.Model):
 
 class Order(models.Model):
      Orderproduct = models.ForeignKey(Product , on_delete=models.CASCADE, verbose_name=_("productref"), blank=True, null=True )
+     
+
+
+
+
+
      order_user=models.ForeignKey(User, on_delete=models.CASCADE , blank=True, null=True)
      
 class Rating(models.Model):
@@ -60,5 +83,6 @@ class Rating(models.Model):
 #table between owner and product
 class OwnerProduct(models.Model):
     OwnerUser=models.ForeignKey(User ,on_delete=models.CASCADE , verbose_name=_("OwnerUser"))
-    OwnerProduct = models.ForeignKey(Product , on_delete=models.CASCADE , verbose_name=_("OwnerProduct"))
-    OwnerQuantity = models.IntegerField(Product)
+    OwnerProduct = models.ForeignKey(Product ,on_delete=models.CASCADE , verbose_name=_("OwnerProduct"))
+    #OwnerQuantity = models.IntegerField(Product)
+    OwnerQuantity= models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(100)],null=True,default=None)

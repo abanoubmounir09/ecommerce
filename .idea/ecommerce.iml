@@ -9,6 +9,8 @@
     <option name="format" value="PLAIN" />
     <option name="myDocStringFormat" value="Plain" />
   </component>
+<<<<<<< HEAD
+=======
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />
     <option name="TEMPLATE_FOLDERS">
@@ -17,4 +19,5 @@
       </list>
     </option>
   </component>
+>>>>>>> 18ca651dcd4ed33a7434a0feb0a1934e9107832a
 </module>

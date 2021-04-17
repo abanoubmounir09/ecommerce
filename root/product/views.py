@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse,Http404
 from django.core.paginator import Paginator
-from .models import Product,Category,Rating,Order
+from .models import Product,Category,Rating,Order,OwnerProduct
 from .forms import addproductform
 #auth
 from knox.auth import TokenAuthentication
@@ -10,8 +10,11 @@ from django.contrib.auth.models import User
 #serialize
 from .serializers import productSerializer, categorySerializer
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework import permissions
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.response import Response
 import json
 from django.http import HttpResponse
@@ -29,7 +32,7 @@ def query_test(request):
         priceSTR = body['price'] 
         # prictInt:int; 
         query = Q()
-        query= Product.objects.all()
+        query=Product.objects.all()
         if(category!=""):
             qtest= Product.objects.filter(Q(PRDCategory__CATName=category))
             if(len(qtest)!= 0):
@@ -167,6 +170,40 @@ def showproduct(request):
     return render(request,'home.html',{'data':obj})
 
 
+
+
+
+# rating function 
+#@action(detail=True,method=['POST'])
+@api_view(['POST'])
+def rate_product(request,id=None):
+    print('***************',request.data)   
+    if 'stars' in request.data:
+        product=Product.objects.filter(id=id)
+        stars= request.data['stars']
+        #user = request.user
+        user =User.objects.get(id=1)
+        print('user',user)
+        try:
+            rating = Rating.objects.get(user=user.id ,prodcut=prodcut.id)
+            rating.stars = stars
+            rating.save()
+            serializer=RatingSerializer(rating,many=False)
+            response={'message':'Rating Updated','result':serializer.data}
+            return Response(response,status=status.HTTP_200_OK)
+           
+
+        except:
+            rating = Rating.objects.create(user=user,prodcut=prodcut,stars=stars)
+            serializer=RatingSerializer(rating,many=False)
+            response={'message':'Rating Created','result':serializer.data}
+            return Response(response,status=status.HTTP_200_OK)
+
+
+       
+    else:
+        response={'message':'You need to provide stars'}
+        return Response(response,status=status.HTTP_400_BAD_REQUEST)
 #tiger
 @api_view(['GET', 'POST'])
 def addp(request):
@@ -179,6 +216,8 @@ def addp(request):
     PRDPrice = body['PRDPrice']
     PRDDiscountPrice = body['PRDDiscountPrice']
     PRDCost = body['PRDCost']
+    PRDQuantity= body['PRDQuantity']
+    print('*************',PRDQuantity)
 
     obj=Product()
     obj.PRDName=PRDName
@@ -188,7 +227,20 @@ def addp(request):
     obj.PRDPrice = PRDPrice
     obj.PRDDiscountPrice = PRDDiscountPrice
     obj.PRDCost = PRDCost
+    #object from owner product
+    obj.PRDQuantity=PRDQuantity
     obj.save()
+    user1=User.objects.get(pk=2)
+    ownerObject=OwnerProduct.objects.create(OwnerQuantity=PRDQuantity,OwnerUser=user1,OwnerProduct=obj)
+    
+    """
+    ownerObject.PRDQuantity=PRDQuantity
+    ownerObject.OwnerUser=User.objects.get(pk=2)
+    ownerObject.OwnerProduct=obj
+    ownerObject.save()
+    """
+    
+   
     return HttpResponse("productadd")
 
 
