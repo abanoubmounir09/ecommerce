@@ -3,6 +3,9 @@ from django.http import HttpResponse,Http404
 from django.core.paginator import Paginator
 from .models import Product,Category,Rating,Order,OwnerProduct
 from .forms import addproductform
+#auth
+from knox.auth import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 #serialize
 from .serializers import productSerializer, categorySerializer
@@ -47,8 +50,7 @@ def query_test(request):
         
         if (len(query) == 0):
             query=Product.objects.all()
-        print("****len(query)*****",len(query))
-        print("****data(query)*****",query)
+      
         snippets = query
         serializer = productSerializer(snippets, many=True)
         return Response(serializer.data)
@@ -57,6 +59,9 @@ def query_test(request):
 # create get all api
 @api_view(['GET', 'POST'])
 def snippet_list(request):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    print("*************requested user is ",request.user)
     if request.method == 'GET':
         snippets = Product.objects.all()
         paginator = Paginator(snippets, 2) # Show 25 contacts per page.
@@ -75,6 +80,7 @@ def query_list(request,cat,name):
 # create get product-details by id
 @api_view(['GET'])
 def productbyid(request,id):
+    print("*************in detais requested user is/////////////// ",request.user)
     snippets = Product.objects.filter(id=id)
     #another query retuen rating from table Rating
     serializer = productSerializer(snippets, many=True)
