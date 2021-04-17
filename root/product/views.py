@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse,Http404
 from django.core.paginator import Paginator
-from .models import Product,Category,Rating,Order
+from .models import Product,Category,Rating,Order,OwnerProduct
 from .forms import addproductform
 from django.contrib.auth.models import User
 #serialize
@@ -164,7 +164,6 @@ def showproduct(request):
     return render(request,'home.html',{'data':obj})
 
 
-<<<<<<< HEAD
 
 
 
@@ -199,7 +198,6 @@ def rate_product(request,id=None):
     else:
         response={'message':'You need to provide stars'}
         return Response(response,status=status.HTTP_400_BAD_REQUEST)
-=======
 #tiger
 @api_view(['GET', 'POST'])
 def addp(request):
@@ -212,6 +210,8 @@ def addp(request):
     PRDPrice = body['PRDPrice']
     PRDDiscountPrice = body['PRDDiscountPrice']
     PRDCost = body['PRDCost']
+    PRDQuantity= body['PRDQuantity']
+    print('*************',PRDQuantity)
 
     obj=Product()
     obj.PRDName=PRDName
@@ -221,7 +221,20 @@ def addp(request):
     obj.PRDPrice = PRDPrice
     obj.PRDDiscountPrice = PRDDiscountPrice
     obj.PRDCost = PRDCost
+    #object from owner product
+    obj.PRDQuantity=PRDQuantity
     obj.save()
+    user1=User.objects.get(pk=2)
+    ownerObject=OwnerProduct.objects.create(OwnerQuantity=PRDQuantity,OwnerUser=user1,OwnerProduct=obj)
+    
+    """
+    ownerObject.PRDQuantity=PRDQuantity
+    ownerObject.OwnerUser=User.objects.get(pk=2)
+    ownerObject.OwnerProduct=obj
+    ownerObject.save()
+    """
+    
+   
     return HttpResponse("productadd")
 
 
@@ -240,4 +253,3 @@ def addtocard(request):
     objorder.Orderproduct=objproduct
     objorder.save()
     return HttpResponse("oederdone")
->>>>>>> 18ca651dcd4ed33a7434a0feb0a1934e9107832a

@@ -64,17 +64,14 @@ class Category(models.Model):
 
 class Order(models.Model):
      Orderproduct = models.ForeignKey(Product , on_delete=models.CASCADE, verbose_name=_("productref"), blank=True, null=True )
-<<<<<<< HEAD
      
 
 
 
 
 
-=======
      order_user=models.ForeignKey(User, on_delete=models.CASCADE , blank=True, null=True)
      
->>>>>>> 18ca651dcd4ed33a7434a0feb0a1934e9107832a
 class Rating(models.Model):
     RATProduct = models.ForeignKey(Product , on_delete=models.CASCADE , verbose_name=_("RATEProduct"))
     RATUser = models.ForeignKey(User ,on_delete=models.CASCADE , verbose_name=_("RATEUser"))
@@ -86,5 +83,6 @@ class Rating(models.Model):
 #table between owner and product
 class OwnerProduct(models.Model):
     OwnerUser=models.ForeignKey(User ,on_delete=models.CASCADE , verbose_name=_("OwnerUser"))
-    OwnerProduct = models.ForeignKey(Product , on_delete=models.CASCADE , verbose_name=_("OwnerProduct"))
-    OwnerQuantity = models.IntegerField(Product)
+    OwnerProduct = models.ForeignKey(Product ,on_delete=models.CASCADE , verbose_name=_("OwnerProduct"))
+    #OwnerQuantity = models.IntegerField(Product)
+    OwnerQuantity= models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(100)],null=True,default=None)
