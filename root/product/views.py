@@ -8,7 +8,7 @@ from knox.auth import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 #serialize
-from .serializers import productSerializer, categorySerializer
+from .serializers import productSerializer, categorySerializer,ownerProductSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework import permissions
@@ -259,3 +259,25 @@ def addtocard(request):
     objorder.Orderproduct=objproduct
     objorder.save()
     return HttpResponse("oederdone")
+
+
+@api_view(['POST'])
+def owenerProduct(request):
+    ownerobj=OwnerProduct.objects.filter(OwnerUser=2)
+    op=ownerobj[0].Ownerproduct.pk
+    productarr=[]
+    i=0
+    while (i<len(ownerobj)):
+        filteredproduct=Product.objects.get(pk=op)
+        productarr.append(filteredproduct)
+        i+=1
+    #print('**************',filteredproduct)
+    #print('**************',op)
+    #to convert data to jason
+    serializer =productSerializer(productarr, many=True)
+    print('*********************',serializer.data)
+    return Response(serializer.data)
+    #return HttpResponse("aaaaaaaa")
+    
+   
+

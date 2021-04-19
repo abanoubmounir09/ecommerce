@@ -12,6 +12,7 @@ class Product(models.Model):
     PRDCategory = models.ForeignKey('Category' , on_delete=models.CASCADE , blank=True, null=True ,verbose_name=_("Category "))
     #PRDBrand = models.ForeignKey('settings.Brand' , on_delete=models.CASCADE , blank=True, null=True ,verbose_name=_("Brand "))
     PRDDesc = models.TextField(verbose_name=_("Description"))
+    PRDQuantity= models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(100)],null=True,default=None)
     PRDImage = models.ImageField(upload_to='prodcut/' , verbose_name=_("Image") , blank=True, null=True)
     PRDPrice = models.FloatField( verbose_name=_("Price"))
     PRDDiscountPrice = models.FloatField(   verbose_name=_("Discount Price"))
@@ -83,6 +84,5 @@ class Rating(models.Model):
 #table between owner and product
 class OwnerProduct(models.Model):
     OwnerUser=models.ForeignKey(User ,on_delete=models.CASCADE , verbose_name=_("OwnerUser"))
-    OwnerProduct = models.ForeignKey(Product ,on_delete=models.CASCADE , verbose_name=_("OwnerProduct"))
+    Ownerproduct = models.ForeignKey(Product ,on_delete=models.CASCADE , verbose_name=_("OwnerProduct"),related_name='tracks')
     #OwnerQuantity = models.IntegerField(Product)
-    OwnerQuantity= models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(100)],null=True,default=None)
