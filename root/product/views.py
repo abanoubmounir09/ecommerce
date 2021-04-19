@@ -80,6 +80,8 @@ def query_list(request,cat,name):
 # create get product-details by id
 @api_view(['GET'])
 def productbyid(request,id):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
     print("*************in detais requested user is/////////////// ",request.user)
     snippets = Product.objects.filter(id=id)
     #another query retuen rating from table Rating
@@ -177,7 +179,9 @@ def showproduct(request):
 #@action(detail=True,method=['POST'])
 @api_view(['POST'])
 def rate_product(request,id=None):
-    print('***************',request.data)   
+    print('*******request.data********',request.data) 
+    # authentication_classes = (TokenAuthentication,)
+    # permission_classes = (IsAuthenticated,)  
     if 'stars' in request.data:
         product=Product.objects.filter(id=id)
         stars= request.data['stars']
