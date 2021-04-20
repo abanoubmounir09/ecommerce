@@ -5,7 +5,7 @@ from .models import Product,Category,Rating,Order
 from .forms import addproductform
 from django.contrib.auth.models import User
 #serialize
-from .serializers import productSerializer, categorySerializer
+from .serializers import productSerializer, categorySerializer, orderSerializer
 from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework.decorators import api_view
@@ -201,3 +201,30 @@ def addtocard(request):
     objorder.Orderproduct=objproduct
     objorder.save()
     return HttpResponse("oederdone")
+
+
+
+#tiger
+@api_view(['GET', 'POST'])
+def mycard(request):
+
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    uid=body['uid']
+
+    obj=Order.objects.all().filter(order_user=uid)
+    print("xxxxxxxxxxxxxxmy cardxxxxxxxxxxxxxxxxxxxxxxxxx")
+    print(obj)
+    print(obj[0].Orderproduct.id)
+
+    #objorder=obj.Orderproduct__id
+    i=0
+    data=[]
+    while(i<len(obj)):
+        objproduct = Product.objects.all().filter(id=obj[i].Orderproduct.id)
+    #product=objorder.Orderproduct
+        serializer = productSerializer(objproduct, many=True)
+        data.append(serializer.data)
+        i=i+1
+
+    return Response(data)
