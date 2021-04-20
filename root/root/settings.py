@@ -88,12 +88,12 @@ CORS_ORIGIN_WHITELIST = (
 
 
 
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:4200',
-] # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
-CORS_ORIGIN_REGEX_WHITELIST = [
-    'http://localhost:8000',
-]
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:4200',
+# ] # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
+# CORS_ORIGIN_REGEX_WHITELIST = [
+#     'http://localhost:8000',
+# ]
 
 # Access-Control-Allow-Origin: 'http://localhost:4200'
 
@@ -122,6 +122,7 @@ WSGI_APPLICATION = 'root.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+
 DATABASES = {
     'default': {
         #'ENGINE': 'django.db.backends.sqlite3',
@@ -145,8 +146,8 @@ DATABASES = {
         'PORT':'5432',
     }
 }
-"""
 
+"""
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

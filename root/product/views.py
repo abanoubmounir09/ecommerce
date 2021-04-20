@@ -8,7 +8,7 @@ from knox.auth import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 #serialize
-from .serializers import productSerializer, categorySerializer
+from .serializers import productSerializer, categorySerializer,ownerProductSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework import permissions
@@ -64,7 +64,7 @@ def snippet_list(request):
     print("*************requested user is ",request.user)
     if request.method == 'GET':
         snippets = Product.objects.all()
-        paginator = Paginator(snippets, 2) # Show 25 contacts per page.
+        paginator = Paginator(snippets, 40) # Show 25 contacts per page.
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         serializer = productSerializer(page_obj, many=True)
@@ -106,11 +106,6 @@ def home(request):
 
     return render(request, 'pagination.html', {'page_obj': page_obj})
 
-    """category_list= Category.objects.filter(product__PRDName='note 11')
-    print('**************',category_list)
-    print(list_samsung)
-    return HttpResponse(list_samsung.first())"""
-
 
 
 def addproduct(request):
@@ -138,42 +133,6 @@ def ratingItem(request,id):
     print(sum)
     return HttpResponse("sum is ="+ str(sum))
     
-#get rating from product for item >>
-# def 
-
-"""
-@login
-def addtocard(request):
-    loginuser = request.user
-    productid = itemId
-    objectfromOrdertable??
-
-"""
-
-#function to display product details
-"""
-def product_details(request):
-    products=Product.objects.get(id=productid)
-    return render(request,"detail.html",{'products':products})
-    """
-
-
-    # elif request.method == 'POST':
-    #     serializer = SnippetSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-def showproduct(request):
-    obj=Product.objects.all()
-    return render(request,'home.html',{'data':obj})
-
-
-
-
 
 # rating function 
 #@action(detail=True,method=['POST'])
@@ -202,53 +161,66 @@ def rate_product(request,id=None):
             serializer=RatingSerializer(rating,many=False)
             response={'message':'Rating Created','result':serializer.data}
             return Response(response,status=status.HTTP_200_OK)
-
-
-       
     else:
         response={'message':'You need to provide stars'}
         return Response(response,status=status.HTTP_400_BAD_REQUEST)
-#tiger
+
+#add product in tow tables owner and product
 @api_view(['GET', 'POST'])
-def addp(request):
-    body_unicode = request.body.decode('utf-8')
-    body = json.loads(body_unicode)
-    PRDName=body['PRDName']
-    PRDCategory = body['PRDCategory']
-    PRDDesc = body['PRDDesc']
-    PRDImage = body['PRDImage']
-    PRDPrice = body['PRDPrice']
-    PRDDiscountPrice = body['PRDDiscountPrice']
-    PRDCost = body['PRDCost']
-    PRDQuantity= body['PRDQuantity']
-    print('*************',PRDQuantity)
+def addp(request,*args,**kwargs):
+    print('-------------------',request.data)
+    print('-------********------------',request.data['cover'])
+    print('-------****PRDName****------------',request.data['PRDName'])
+
+    file=request.data['cover']
+    # prd = Product.objects.create(PRDName="h1",PRDCategory__CATName = 'apple',
+    # PRDDesc="ttt",PRDImage=file,PRDPrice="25",PRDDiscountPrice="2",PRDCost="5",PRDQuantity="3")
+
+    # body_unicode = request.body.decode('utf-8')
+    # body = json.loads(body_unicode)
+    # print('*****body********',body)
+
+
+    
+    PRDName=request.data['PRDName']
+    PRDCategory = request.data['PRDCategory']
+    PRDDesc = request.data['PRDDesc']
+    PRDImage = file
+    PRDPrice = "50"
+    PRDDiscountPrice = "3"
+    PRDCost = "2"
+    PRDQuantity= "3"
+
+    catob = Category.objects.get(CATName=PRDCategory)
+
+    # PRDName=body['PRDName']
+    # PRDCategory = body['PRDCategory']
+    # PRDDesc = body['PRDDesc']
+    # PRDImage = body['PRDImage']
+    # PRDPrice = body['PRDPrice']
+    # PRDDiscountPrice = body['PRDDiscountPrice']
+    # PRDCost = body['PRDCost']
+    # PRDQuantity= body['PRDQuantity']
+    
 
     obj=Product()
     obj.PRDName=PRDName
-    obj.PRDCategory__CATName = PRDCategory
+    obj.PRDCategory = catob
     obj.PRDDesc = PRDDesc
     obj.PRDImage = PRDImage
     obj.PRDPrice = PRDPrice
     obj.PRDDiscountPrice = PRDDiscountPrice
     obj.PRDCost = PRDCost
-    #object from owner product
     obj.PRDQuantity=PRDQuantity
     obj.save()
-    user1=User.objects.get(pk=2)
-    ownerObject=OwnerProduct.objects.create(OwnerQuantity=PRDQuantity,OwnerUser=user1,OwnerProduct=obj)
-    
-    """
-    ownerObject.PRDQuantity=PRDQuantity
-    ownerObject.OwnerUser=User.objects.get(pk=2)
-    ownerObject.OwnerProduct=obj
-    ownerObject.save()
-    """
-    
-   
+    #object from owner product
+    # user1=User.objects.get(pk=2)
+    # ownerObject=OwnerProduct.objects.create(OwnerQuantity=PRDQuantity,OwnerUser=user1,OwnerProduct=obj)
     return HttpResponse("productadd")
 
 
-#tiger
+
+#add to card-----------------------------
 @api_view(['GET', 'POST'])
 def addtocard(request):
     body_unicode = request.body.decode('utf-8')
@@ -263,3 +235,61 @@ def addtocard(request):
     objorder.Orderproduct=objproduct
     objorder.save()
     return HttpResponse("oederdone")
+
+#show business account products
+@api_view(['POST'])
+def owenerProduct(request):
+    ownerobj=OwnerProduct.objects.filter(OwnerUser=2)
+    op=ownerobj[0].Ownerproduct.pk
+    productarr=[]
+    i=0
+    while (i<len(ownerobj)):
+        filteredproduct=Product.objects.get(pk=op)
+        productarr.append(filteredproduct)
+        i+=1
+    serializer =productSerializer(productarr, many=True)
+    print('*********************',serializer.data)
+    return Response(serializer.data)
+    
+   
+
+
+
+#get rating from product for item >>
+# def 
+
+"""
+@login
+def addtocard(request):
+    loginuser = request.user
+    productid = itemId
+    objectfromOrdertable??
+
+"""
+
+#function to display product details
+"""
+    def product_details(request):
+    products=Product.objects.get(id=productid)
+    return render(request,"detail.html",{'products':products})
+"""
+
+
+    # elif request.method == 'POST':
+    #     serializer = SnippetSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# def showproduct(request):
+#     obj=Product.objects.all()
+#     return render(request,'home.html',{'data':obj})
+
+"""
+    category_list= Category.objects.filter(product__PRDName='note 11')
+    print('**************',category_list)
+    print(list_samsung)
+    return HttpResponse(list_samsung.first())
+"""
+
