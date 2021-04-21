@@ -22,6 +22,7 @@ urlpatterns = [
     path('add/',views.addp,name="add"),
     path('order/',views.addtocard,name="order"),
     path('mycard/',views.mycard,name="mycard"),
+    path('delcard/',views.delitemfromcard,name="delitemfromcard"),
     path('rate/<int:id>/',views.ratingItem,name="ratingItem"), 
 ]
 if settings.DEBUG:

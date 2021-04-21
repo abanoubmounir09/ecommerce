@@ -228,3 +228,16 @@ def mycard(request):
         i=i+1
 
     return Response(data)
+
+
+
+#tiger
+@api_view(['GET', 'POST'])
+def delitemfromcard(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    uid = body['uid']
+    pid=body['pid']
+    obj=Order.objects.all().filter(Orderproduct=pid,order_user=uid)
+    obj.delete()
+    return HttpResponse("item deleted")
