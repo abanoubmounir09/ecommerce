@@ -8,7 +8,7 @@ from knox.auth import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 #serialize
-from .serializers import productSerializer, categorySerializer,ownerProductSerializer
+from .serializers import productSerializer, categorySerializer,ownerProductSerializer,RatingSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework import permissions
@@ -64,7 +64,7 @@ def snippet_list(request):
     print("*************requested user is ",request.user)
     if request.method == 'GET':
         snippets = Product.objects.all()
-        paginator = Paginator(snippets, 40) # Show 25 contacts per page.
+        paginator = Paginator(snippets, 6) # Show 25 contacts per page.
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         serializer = productSerializer(page_obj, many=True)
@@ -122,42 +122,28 @@ def addproduct(request):
          return render(request,'new_product.html',{'form':form})
 
 
-
-
-#get ratingItem for item 
-def ratingItem(request,id):
-    query = Rating.objects.filter(RATProduct__pk=id)
-    sum = 0
-    for item in query:
-        sum += item.stars
-    print(sum)
-    return HttpResponse("sum is ="+ str(sum))
-    
-
 # rating function 
 #@action(detail=True,method=['POST'])
 @api_view(['POST'])
 def rate_product(request,id=None):
-    print('*******request.data********',request.data) 
-    # authentication_classes = (TokenAuthentication,)
-    # permission_classes = (IsAuthenticated,)  
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    usernameget=request.data['uname']
+    user =User.objects.get(username=usernameget)
+    
     if 'stars' in request.data:
-        product=Product.objects.filter(id=id)
+        product=Product.objects.get(id=request.data['prdId'])
         stars= request.data['stars']
-        #user = request.user
-        user =User.objects.get(id=1)
-        print('user',user)
+        user =User.objects.get(username=usernameget)
         try:
-            rating = Rating.objects.get(user=user.id ,prodcut=prodcut.id)
+            rating = Rating.objects.get(RATUser=user.id ,RATProduct=product.id)
             rating.stars = stars
             rating.save()
             serializer=RatingSerializer(rating,many=False)
             response={'message':'Rating Updated','result':serializer.data}
             return Response(response,status=status.HTTP_200_OK)
-           
-
         except:
-            rating = Rating.objects.create(user=user,prodcut=prodcut,stars=stars)
+            rating = Rating.objects.create(RATUser=user,RATProduct=product,stars=stars)
             serializer=RatingSerializer(rating,many=False)
             response={'message':'Rating Created','result':serializer.data}
             return Response(response,status=status.HTTP_200_OK)

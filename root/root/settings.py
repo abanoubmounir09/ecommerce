@@ -86,13 +86,10 @@ CORS_ORIGIN_WHITELIST = (
   'http://localhost:4200',
 )
 
+# If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
 
-
-# CORS_ORIGIN_WHITELIST = [
-#     'http://localhost:4200',
-# ] # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
 # CORS_ORIGIN_REGEX_WHITELIST = [
-#     'http://localhost:8000',
+#     'http://localhost:4200',
 # ]
 
 # Access-Control-Allow-Origin: 'http://localhost:4200'
