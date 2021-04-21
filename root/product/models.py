@@ -21,7 +21,7 @@ class Product(models.Model):
     PRDQuantity= models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(100)],null=True,default=None)
 
     PRDImage = models.ImageField(upload_to=nameFile , verbose_name=_("Image") , blank=True, null=True)
-
+     
     PRDPrice = models.FloatField( verbose_name=_("Price"))
     PRDDiscountPrice = models.FloatField(verbose_name=_("Discount Price"))
     PRDCost = models.FloatField(verbose_name=_("Cost"))
@@ -86,3 +86,4 @@ class Rating(models.Model):
 class OwnerProduct(models.Model):
     OwnerUser=models.ForeignKey(User ,on_delete=models.CASCADE , verbose_name=_("OwnerUser"))
     Ownerproduct = models.ForeignKey(Product ,on_delete=models.CASCADE , verbose_name=_("OwnerProduct"),related_name='tracks')
+    
