@@ -123,7 +123,7 @@ def addproduct(request):
 
 
 # rating function 
-#@action(detail=True,method=['POST'])
+
 @api_view(['POST'])
 def rate_product(request,id=None):
     authentication_classes = (TokenAuthentication,)
@@ -159,15 +159,6 @@ def addp(request,*args,**kwargs):
     print('-------****PRDName****------------',request.data['PRDName'])
 
     file=request.data['cover']
-    # prd = Product.objects.create(PRDName="h1",PRDCategory__CATName = 'apple',
-    # PRDDesc="ttt",PRDImage=file,PRDPrice="25",PRDDiscountPrice="2",PRDCost="5",PRDQuantity="3")
-
-    # body_unicode = request.body.decode('utf-8')
-    # body = json.loads(body_unicode)
-    # print('*****body********',body)
-
-
-    
     PRDName=request.data['PRDName']
     PRDCategory = request.data['PRDCategory']
     PRDDesc = request.data['PRDDesc']
