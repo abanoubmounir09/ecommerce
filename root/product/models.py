@@ -6,20 +6,46 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 # Create your models here.
 
 
+#path for imag
+def upload_path(instance,filename):
+    return '/media'.join(['product',str(instance.PRDName),filename])
+
+def nameFile(instance, filename):
+    return '/'.join(['images', str(instance.PRDName), filename])
+    
 class Product(models.Model):
     PRDName = models.CharField(max_length=100 , verbose_name=_("Product Name "))
-    PRDRate = models.ForeignKey('Rating' , on_delete=models.CASCADE ,blank=True, null=True , verbose_name=_("PRDRate"))
+    # PRDRate = models.ForeignKey('Rating' , on_delete=models.CASCADE ,blank=True, null=True , verbose_name=_("PRDRate"))
     PRDCategory = models.ForeignKey('Category' , on_delete=models.CASCADE , blank=True, null=True ,verbose_name=_("Category "))
-    #PRDBrand = models.ForeignKey('settings.Brand' , on_delete=models.CASCADE , blank=True, null=True ,verbose_name=_("Brand "))
     PRDDesc = models.TextField(verbose_name=_("Description"))
-    PRDImage = models.ImageField(upload_to='prodcut/' , verbose_name=_("Image") , blank=True, null=True)
+    PRDQuantity= models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(100)],null=True,default=None)
+
+    PRDImage = models.ImageField(upload_to=nameFile , verbose_name=_("Image") , blank=True, null=True)
+     
     PRDPrice = models.FloatField( verbose_name=_("Price"))
-    PRDDiscountPrice = models.FloatField(   verbose_name=_("Discount Price"))
-    PRDCost = models.FloatField(  verbose_name=_("Cost"))
+    PRDDiscountPrice = models.FloatField(verbose_name=_("Discount Price"))
+    PRDCost = models.FloatField(verbose_name=_("Cost"))
     PRDCreatedNow = models.DateTimeField(auto_now_add=True,verbose_name=_("Created in"))
     
     def __str__(self):
         return self.PRDName
+
+
+    def no_of_rating(self):
+        ratings=Rating.objects.filter(RATProduct=self)
+        return len(ratings)
+
+
+    def avg_of_rating(self):
+        sum=0
+        ratings=Rating.objects.filter(RATProduct=self)
+        for rating in ratings:
+            sum+=rating.stars
+            if len(ratings)>0:
+                return sum/len(ratings)
+            else:
+                return 0
+
 
 #----------------------------------------
 
@@ -53,12 +79,11 @@ class Rating(models.Model):
     RATProduct = models.ForeignKey(Product , on_delete=models.CASCADE , verbose_name=_("RATEProduct"))
     RATUser = models.ForeignKey(User ,on_delete=models.CASCADE , verbose_name=_("RATEUser"))
     stars = models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)])
-    # def __str__(self):
-    #     return str(self.RATProduct__PRDName)
+ 
 
 
 #table between owner and product
 class OwnerProduct(models.Model):
     OwnerUser=models.ForeignKey(User ,on_delete=models.CASCADE , verbose_name=_("OwnerUser"))
-    OwnerProduct = models.ForeignKey(Product , on_delete=models.CASCADE , verbose_name=_("OwnerProduct"))
-    OwnerQuantity = models.IntegerField(Product)
+    Ownerproduct = models.ForeignKey(Product ,on_delete=models.CASCADE , verbose_name=_("OwnerProduct"),related_name='tracks')
+    

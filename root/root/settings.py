@@ -83,8 +83,9 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ORIGIN_WHITELIST = (
-  'http://localhost:8000',
+  'http://localhost:4200',
 )
+
 
 
 # CORS_ORIGIN_WHITELIST = [
@@ -93,6 +94,8 @@ CORS_ORIGIN_WHITELIST = (
 # CORS_ORIGIN_REGEX_WHITELIST = [
 #     'http://localhost:8000',
 # ]
+
+# Access-Control-Allow-Origin: 'http://localhost:4200'
 
 
 
@@ -131,8 +134,20 @@ DATABASES = {
         'HOST': 'localhost',
     }
 }
+"""
 
+DATABASES = {
+    'default': {
+       'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'finaldb',
+        'USER':'postgres',
+        'PASSWORD':'root',
+        'HOST':'localhost',
+        'PORT':'5432',
+    }
+}
 
+"""
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
