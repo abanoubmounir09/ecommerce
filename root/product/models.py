@@ -60,8 +60,8 @@ class ProductImage(models.Model):
 class Category(models.Model):
     CATName = models.CharField(max_length=50 , verbose_name=_("Name"))
     CATParent = models.ForeignKey('self' ,limit_choices_to={'CATParent__isnull' : True}, verbose_name=_("Main Category"), on_delete=models.CASCADE , blank=True, null=True)
-    CATDesc = models.TextField( verbose_name=_("Description"))
-    CATImg = models.ImageField(upload_to='category/' , verbose_name=_("Image"))
+    CATDesc = models.TextField( verbose_name=_("Description"),null=True)
+    CATImg = models.ImageField(upload_to='category/' , verbose_name=_("Image"),null=True)
 
     class Meta:
         verbose_name = _("Category")
@@ -74,7 +74,7 @@ class Category(models.Model):
 class Order(models.Model):
      Orderproduct = models.ForeignKey(Product , on_delete=models.CASCADE, verbose_name=_("productref"), blank=True, null=True )
      order_user=models.ForeignKey(User, on_delete=models.CASCADE , blank=True, null=True)
-     
+     order_quantity=models.IntegerField(null=True)  
 class Rating(models.Model):
     RATProduct = models.ForeignKey(Product , on_delete=models.CASCADE , verbose_name=_("RATEProduct"))
     RATUser = models.ForeignKey(User ,on_delete=models.CASCADE , verbose_name=_("RATEUser"))

@@ -23,6 +23,10 @@ urlpatterns = [
     # path('rate/<str:id>/',views.rate_product,name="ratingItem"), 
     path('add/',views.addp,name="add"),
     path('order/',views.addtocard,name="order"),
+    path('mycard/',views.mycard,name="mycard"),
+    path('delcard/',views.delitemfromcard,name="delitemfromcard"),
+    path('delfromcard/',views.delonefromcard,name="delonefromcard"),
+    # path('rate/<int:id>/',views.ratingItem,name="ratingItem"), 
     path('ownerproduct/',views.owenerProduct,name='ownerproduct')
 ]
 if settings.DEBUG:

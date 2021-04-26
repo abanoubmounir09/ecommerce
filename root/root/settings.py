@@ -125,7 +125,7 @@ DATABASES = {
         #'ENGINE': 'django.db.backends.sqlite3',
         #'NAME': BASE_DIR / 'db.sqlite3',
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'finaldb',
+        'NAME': 'testfproject',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',

@@ -8,7 +8,11 @@ from knox.auth import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 #serialize
+
+from .serializers import productSerializer, categorySerializer, orderSerializer
+
 from .serializers import productSerializer, categorySerializer,ownerProductSerializer,RatingSerializer
+
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework import permissions
@@ -154,19 +158,34 @@ def rate_product(request,id=None):
 #add product in tow tables owner and product
 @api_view(['GET', 'POST'])
 def addp(request,*args,**kwargs):
-    print('-------------------',request.data)
-    print('-------********------------',request.data['cover'])
-    print('-------****PRDName****------------',request.data['PRDName'])
 
     file=request.data['cover']
+
+    print("***************",request.data) 
+    print("******name*********",request.data['PRDName'])
+    # prd = Product.objects.create(PRDName="h1",PRDCategory__CATName = 'apple',
+    # PRDDesc="ttt",PRDImage=file,PRDPrice="25",PRDDiscountPrice="2",PRDCost="5",PRDQuantity="3")
+
+    # body_unicode = request.body.decode('utf-8')
+    # body = json.loads(body_unicode)
+    # print('*****body********',body)
+
+
+    
+
     PRDName=request.data['PRDName']
     PRDCategory = request.data['PRDCategory']
     PRDDesc = request.data['PRDDesc']
     PRDImage = file
-    PRDPrice = "50"
-    PRDDiscountPrice = "3"
-    PRDCost = "2"
-    PRDQuantity= "3"
+    # PRDPrice = "50"
+    # PRDDiscountPrice = "3"
+    # PRDCost = "2"
+    # PRDQuantity= "3"
+    PRDPrice = request.data['PRDPrice']
+    PRDDiscountPrice = request.data['PRDDiscountPrice']
+    PRDCost = request.data['PRDCost']
+    PRDQuantity= request.data['PRDQuantity']
+    newcat=request.data['newcat']
 
     catob = Category.objects.get(CATName=PRDCategory)
 
@@ -174,12 +193,15 @@ def addp(request,*args,**kwargs):
     # PRDCategory = body['PRDCategory']
     # PRDDesc = body['PRDDesc']
     # PRDImage = body['PRDImage']
-    # PRDPrice = body['PRDPrice']
-    # PRDDiscountPrice = body['PRDDiscountPrice']
-    # PRDCost = body['PRDCost']
-    # PRDQuantity= body['PRDQuantity']
+    # PRDPrice = request.data['PRDPrice']
+    # PRDDiscountPrice = request.data['PRDDiscountPrice']
+    # PRDCost = request.data['PRDCost']
+    # PRDQuantity= request.data['PRDQuantity']
     
-
+    if newcat :
+        objcat=Category()
+        objcat.CATName=newcat
+        objcat.save()
     obj=Product()
     obj.PRDName=PRDName
     obj.PRDCategory = catob
@@ -204,14 +226,77 @@ def addtocard(request):
     body = json.loads(body_unicode)
     id = body['pid']
     uid=body['uid']
-    userobj=User.objects.get(id=uid)
-    objproduct=Product.objects.get(id=id)
-    objorder=Order()
-    objorder.order_user=userobj
-
-    objorder.Orderproduct=objproduct
-    objorder.save()
+    q=body['quantity']
+    obj=Order.objects.filter( Orderproduct__id=id,order_user=uid)
+    if not obj:
+        userobj=User.objects.get(id=uid)
+        objproduct=Product.objects.get(id=id)
+        objorder=Order()
+        objorder.order_user=userobj
+        objorder.order_quantity=q
+        objorder.Orderproduct=objproduct
+        objorder.save()
     return HttpResponse("oederdone")
+
+
+#tiger
+@api_view(['GET', 'POST'])
+def delonefromcard(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    id = body['pid']
+    uid=body['uid']
+    q=body['quantity'] 
+    obj=Order.objects.get( Orderproduct__id=id,order_user=uid)
+    print("sddsdsdsdsd",obj)
+    obj.order_quantity=q
+    obj.save()
+    return HttpResponse("done")
+#tiger
+@api_view(['GET', 'POST'])
+def mycard(request):
+
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    uid=body['uid']
+
+    obj=Order.objects.all().filter(order_user=uid)
+    print("xxxxxxxxxxxxxxmy cardxxxxxxxxxxxxxxxxxxxxxxxxx")
+    print(obj)
+    print(obj[0].Orderproduct.id)
+
+    #objorder=obj.Orderproduct__id
+    i=0
+    data=[]
+    quan=[]
+    while(i<len(obj)):
+        objproduct = Product.objects.all().filter(id=obj[i].Orderproduct.id)
+    #product=objorder.Orderproduct
+        serializer = productSerializer(objproduct, many=True)
+        
+        
+        data.append(serializer.data)
+        quan.append(obj[i].order_quantity)
+        i=i+1
+    # print("data end ")
+    # print(data)
+    dic={}
+    dic['d']=data
+    dic['q']=quan
+    return Response(dic)
+
+
+
+#tiger
+@api_view(['GET', 'POST'])
+def delitemfromcard(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    uid = body['uid']
+    pid=body['pid']
+    obj=Order.objects.all().filter(Orderproduct=pid,order_user=uid)
+    obj.delete()
+    return HttpResponse("item deleted")
 
 #show business account products
 @api_view(['POST'])
@@ -269,4 +354,5 @@ def addtocard(request):
     print(list_samsung)
     return HttpResponse(list_samsung.first())
 """
+
 
