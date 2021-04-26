@@ -7,7 +7,7 @@ from .models import Product,Category,Order,OwnerProduct
 class productSerializer(serializers.ModelSerializer):
     class Meta:
         model=Product
-        fields=['id','PRDName','PRDCategory','PRDDesc','PRDImage','PRDPrice','PRDDiscountPrice','PRDCost','no_of_rating','avg_of_rating']
+        fields=['id','PRDName','PRDCategory','PRDDesc','PRDQuantity','PRDImage','PRDPrice','PRDDiscountPrice','PRDCost','no_of_rating','avg_of_rating']
 
 
 class categorySerializer(serializers.ModelSerializer):
