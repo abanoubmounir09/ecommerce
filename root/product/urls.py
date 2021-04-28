@@ -26,6 +26,7 @@ urlpatterns = [
     path('mycard/',views.mycard,name="mycard"),
     path('delcard/',views.delitemfromcard,name="delitemfromcard"),
     path('delfromcard/',views.delonefromcard,name="delonefromcard"),
+    path('del_after_buy/',views.del_after_buy,name="del_after_buy"),
     # path('rate/<int:id>/',views.ratingItem,name="ratingItem"), 
     path('ownerproduct/',views.owenerProduct,name='ownerproduct')
 ]

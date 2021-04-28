@@ -89,7 +89,9 @@ def productbyid(request,id):
     print("*************in detais requested user is/////////////// ",request.user)
     snippets = Product.objects.filter(id=id)
     #another query retuen rating from table Rating
+   
     serializer = productSerializer(snippets, many=True)
+    print("qqqqqqq",serializer.data)
     return Response(serializer.data)
 
 # create get api categories
@@ -224,6 +226,7 @@ def addp(request,*args,**kwargs):
 def addtocard(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
+    print("bodyyyy",body)
     id = body['pid']
     uid=body['uid']
     q=body['quantity']
@@ -261,9 +264,7 @@ def mycard(request):
     uid=body['uid']
 
     obj=Order.objects.all().filter(order_user=uid)
-    print("xxxxxxxxxxxxxxmy cardxxxxxxxxxxxxxxxxxxxxxxxxx")
-    print(obj)
-    print(obj[0].Orderproduct.id)
+    
 
     #objorder=obj.Orderproduct__id
     i=0
@@ -284,6 +285,35 @@ def mycard(request):
     dic['d']=data
     dic['q']=quan
     return Response(dic)
+
+
+
+
+#tiger
+@api_view(['POST'])
+def del_after_buy(request):
+
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    uid=body['uid']
+    i=0
+    obj=Order.objects.all().filter(order_user=uid)
+    print("order obj",obj)
+    while(i<len(obj)):
+        q=obj[i].order_quantity
+        d=obj[i].Orderproduct.id
+        objproduct=Product.objects.get(id=d)
+        objproduct.PRDQuantity=objproduct.PRDQuantity-q
+
+        objowner=OwnerProduct.objects.get(Ownerproduct=d)
+        objowner.OwnerQuantity=objowner.OwnerQuantity-q
+        
+        i=i+1
+        objproduct.save()
+        objowner.save()
+    obj.delete()    
+    return HttpResponse("done")    
+        
 
 
 
