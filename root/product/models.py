@@ -75,6 +75,7 @@ class Order(models.Model):
      Orderproduct = models.ForeignKey(Product , on_delete=models.CASCADE, verbose_name=_("productref"), blank=True, null=True )
      order_user=models.ForeignKey(User, on_delete=models.CASCADE , blank=True, null=True)
      order_quantity=models.IntegerField(null=True)  
+     
 class Rating(models.Model):
     RATProduct = models.ForeignKey(Product , on_delete=models.CASCADE , verbose_name=_("RATEProduct"))
     RATUser = models.ForeignKey(User ,on_delete=models.CASCADE , verbose_name=_("RATEUser"))
