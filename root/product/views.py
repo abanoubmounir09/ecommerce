@@ -68,11 +68,12 @@ def snippet_list(request):
     print("*************requested user is ",request.user)
     if request.method == 'GET':
         snippets = Product.objects.all()
-        paginator = Paginator(snippets, 6) # Show 25 contacts per page.
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
-        serializer = productSerializer(page_obj, many=True)
-        return Response(serializer.data)
+        # paginator = Paginator(snippets, 6) # Show 25 contacts per page.
+        # page_number = request.GET.get('page')
+        # page_obj = paginator.get_page(page_number)
+        product_list = productSerializer(snippets, many=True)
+        context = {'product_list' : product_list.data}
+        return Response(context)
 
 # create get api
 @api_view(['GET', 'POST'])
@@ -114,18 +115,6 @@ def home(request):
 
 
 
-def addproduct(request):
-    if request.method == 'POST':
-        obproduct=Product()
-        form = addproductform(request.POST,request.FILES)
-        if form.is_valid():
-            newproduct = form.save(commit=False)
-            newproduct.save()
-        return  HttpResponse('item added')
-
-    else:
-         form = addproductform()
-         return render(request,'new_product.html',{'form':form})
 
 
 # rating function 
@@ -136,7 +125,6 @@ def rate_product(request,id=None):
     permission_classes = (IsAuthenticated,)
     usernameget=request.data['uname']
     user =User.objects.get(username=usernameget)
-    
     if 'stars' in request.data:
         product=Product.objects.get(id=request.data['prdId'])
         stars= request.data['stars']
@@ -158,68 +146,103 @@ def rate_product(request,id=None):
         return Response(response,status=status.HTTP_400_BAD_REQUEST)
 
 #add product in tow tables owner and product
-@api_view(['GET', 'POST'])
-def addp(request,*args,**kwargs):
+@api_view(['POST'])
+def addp(request):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    if  request.user:
+        userId=request.data['userid']
+        file=request.data['cover']       
+        PRDName=request.data['PRDName']
+        PRDCategory = request.data['PRDCategory']
+        PRDDesc = request.data['PRDDesc']
+        PRDImage = file
+        PRDPrice = request.data['PRDPrice']
+        PRDDiscountPrice = request.data['PRDDiscountPrice']
+        PRDCost = request.data['PRDCost']
+        PRDQuantity= request.data['PRDQuantity']
 
-    file=request.data['cover']
+        newcat=request.data['newcat']
+        catob = Category.objects.get(CATName=PRDCategory)
+        obj=Product()
+        if newcat :
+            objcat=Category()
+            objcat.CATName=newcat
+            objcat.save()
+            catob = Category.objects.get(CATName=newcat)
+        
+        obj=Product()
+        obj.PRDName=PRDName
+        obj.PRDCategory = catob
+        obj.PRDDesc = PRDDesc
+        obj.PRDImage = PRDImage
+        obj.PRDPrice = PRDPrice
+        obj.PRDDiscountPrice = PRDDiscountPrice
+        obj.PRDCost = PRDCost
+        obj.PRDQuantity=PRDQuantity
+        obj.save()
+        #object from owner product
+        user1=User.objects.get(pk=userId)
+        ownerObject=OwnerProduct.objects.create(OwnerQuantity=PRDQuantity,OwnerUser=user1,Ownerproduct=obj)
+        response={'message':'product added'}
+        return Response(response,status=status.HTTP_200_OK)
+    else:
+        response={'message':'error in added product'}
+        return Response(response,status=status.HTTP_400_BAD_REQUEST)
 
-    print("***************",request.data) 
-    print("******name*********",request.data['PRDName'])
-    # prd = Product.objects.create(PRDName="h1",PRDCategory__CATName = 'apple',
-    # PRDDesc="ttt",PRDImage=file,PRDPrice="25",PRDDiscountPrice="2",PRDCost="5",PRDQuantity="3")
 
-    # body_unicode = request.body.decode('utf-8')
-    # body = json.loads(body_unicode)
-    # print('*****body********',body)
-
-
-    
-
+#edit item
+@api_view(['POST'])
+def editItem(request):
+    print("*********data********",request.data)
+    file=request.data['cover']    
     PRDName=request.data['PRDName']
     PRDCategory = request.data['PRDCategory']
     PRDDesc = request.data['PRDDesc']
     PRDImage = file
-    # PRDPrice = "50"
-    # PRDDiscountPrice = "3"
-    # PRDCost = "2"
-    # PRDQuantity= "3"
+
     PRDPrice = request.data['PRDPrice']
     PRDDiscountPrice = request.data['PRDDiscountPrice']
     PRDCost = request.data['PRDCost']
     PRDQuantity= request.data['PRDQuantity']
-    newcat=request.data['newcat']
+    # newcat=request.data['newcat']
 
     catob = Category.objects.get(CATName=PRDCategory)
 
-    # PRDName=body['PRDName']
-    # PRDCategory = body['PRDCategory']
-    # PRDDesc = body['PRDDesc']
-    # PRDImage = body['PRDImage']
-    # PRDPrice = request.data['PRDPrice']
-    # PRDDiscountPrice = request.data['PRDDiscountPrice']
-    # PRDCost = request.data['PRDCost']
-    # PRDQuantity= request.data['PRDQuantity']
     
-    if newcat :
-        objcat=Category()
-        objcat.CATName=newcat
-        objcat.save()
-    obj=Product()
-    obj.PRDName=PRDName
-    obj.PRDCategory = catob
-    obj.PRDDesc = PRDDesc
-    obj.PRDImage = PRDImage
-    obj.PRDPrice = PRDPrice
-    obj.PRDDiscountPrice = PRDDiscountPrice
-    obj.PRDCost = PRDCost
-    obj.PRDQuantity=PRDQuantity
-    obj.save()
-    #object from owner product
-    # user1=User.objects.get(pk=2)
-    # ownerObject=OwnerProduct.objects.create(OwnerQuantity=PRDQuantity,OwnerUser=user1,OwnerProduct=obj)
-    return HttpResponse("productadd")
+    # if newcat :
+    #     objcat=Category()
+    #     objcat.CATName=newcat
+    #     objcat.save()
+    # obj=Product()
+    # obj.PRDName=PRDName
+    # obj.PRDCategory = catob
+    # obj.PRDDesc = PRDDesc
+    # obj.PRDImage = PRDImage
+    # obj.PRDPrice = PRDPrice
+    # obj.PRDDiscountPrice = PRDDiscountPrice
+    # obj.PRDCost = PRDCost
+    # obj.PRDQuantity=PRDQuantity
+    # obj.save()
+    # #object from owner product
+    # # user1=User.objects.get(pk=2)
+    # # ownerObject=OwnerProduct.objects.create(OwnerQuantity=PRDQuantity,OwnerUser=user1,OwnerProduct=obj)
+    # return HttpResponse("productadd")
 
 
+    item = Product.objects.get(id=request.data['PRDId'])
+    item.PRDName=PRDName
+    item.PRDCategory = catob
+    item.PRDDesc = PRDDesc
+    item.PRDImage = PRDImage
+    item.PRDPrice = PRDPrice
+    item.PRDDiscountPrice = PRDDiscountPrice
+    item.PRDCost = PRDCost
+    item.PRDQuantity=PRDQuantity
+    item.save()
+    
+    response={'message':'product added'}
+    return Response(response,status=status.HTTP_200_OK)
 
 #add to card-----------------------------
 @api_view(['GET', 'POST'])
@@ -255,32 +278,29 @@ def delonefromcard(request):
     obj.order_quantity=q
     obj.save()
     return HttpResponse("done")
+    
 #tiger
 @api_view(['GET', 'POST'])
 def mycard(request):
-
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
     uid=body['uid']
-
     obj=Order.objects.all().filter(order_user=uid)
     
 
     #objorder=obj.Orderproduct__id
+    print(obj)
+    print(obj[0].Orderproduct.id)
     i=0
     data=[]
     quan=[]
     while(i<len(obj)):
         objproduct = Product.objects.all().filter(id=obj[i].Orderproduct.id)
-    #product=objorder.Orderproduct
         serializer = productSerializer(objproduct, many=True)
-        
-        
         data.append(serializer.data)
         quan.append(obj[i].order_quantity)
         i=i+1
-    # print("data end ")
-    # print(data)
+        
     dic={}
     dic['d']=data
     dic['q']=quan
@@ -331,21 +351,55 @@ def delitemfromcard(request):
 #show business account products
 @api_view(['POST'])
 def owenerProduct(request):
-    ownerobj=OwnerProduct.objects.filter(OwnerUser=2)
-    op=ownerobj[0].Ownerproduct.pk
-    productarr=[]
-    i=0
-    while (i<len(ownerobj)):
-        filteredproduct=Product.objects.get(pk=op)
-        productarr.append(filteredproduct)
-        i+=1
-    serializer =productSerializer(productarr, many=True)
-    print('*********************',serializer.data)
-    return Response(serializer.data)
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    # print("====user=======",request.data['uid'])
+    if request.data['is_staff']:
+        ownerobj=OwnerProduct.objects.filter(OwnerUser=request.data['uid'])
+        if(len(ownerobj)>0):
+            op=ownerobj[0].Ownerproduct.pk
+            productarr=[]
+            i=0
+            while (i<len(ownerobj)):
+                filteredproduct=Product.objects.get(pk=ownerobj[i].Ownerproduct.pk)
+                productarr.append(filteredproduct)
+                i+=1
+            serializer =productSerializer(productarr, many=True)
+            return Response(serializer.data)
+    else:
+        response={'message':'user no product'}
+        return Response(response,status=status.HTTP_200_OK)
     
    
 
 
+
+
+   
+
+      # prd = Product.objects.create(PRDName="h1",PRDCategory__CATName = 'apple',
+        # PRDDesc="ttt",PRDImage=file,PRDPrice="25",PRDDiscountPrice="2",PRDCost="5",PRDQuantity="3")
+# def addproduct(request):
+#     if request.method == 'POST':
+#         obproduct=Product()
+#         form = addproductform(request.POST,request.FILES)
+#         if form.is_valid():
+#             newproduct = form.save(commit=False)
+#             newproduct.save()
+#         return  HttpResponse('item added')
+
+#     else:
+#          form = addproductform()
+#          return render(request,'new_product.html',{'form':form})
+
+    # PRDName=body['PRDName']
+    # PRDCategory = body['PRDCategory']
+    # PRDDesc = body['PRDDesc']
+    # PRDImage = body['PRDImage']
+    # PRDPrice = request.data['PRDPrice']
+    # PRDDiscountPrice = request.data['PRDDiscountPrice']
+    # PRDCost = request.data['PRDCost']
+    # PRDQuantity= request.data['PRDQuantity']
 
 #get rating from product for item >>
 # def 

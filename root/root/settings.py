@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'knox',
 ]
+
 # AUTH_USER_MODEL= 'accounts.Account'
 
 MIDDLEWARE = [
@@ -122,15 +123,17 @@ WSGI_APPLICATION = 'root.wsgi.application'
 
 DATABASES = {
     'default': {
-        #'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': BASE_DIR / 'db.sqlite3',
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'testfproject',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
+         'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
+
 """
 
 DATABASES = {

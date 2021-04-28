@@ -20,11 +20,12 @@ urlpatterns = [
     path('test/', views.query_test,name="query_test"),
     path('home/',views.home,name="home"),
     path('rate/',views.rate_product,name="ratingItem"), 
-    # path('rate/<str:id>/',views.rate_product,name="ratingItem"), 
     path('add/',views.addp,name="add"),
     path('order/',views.addtocard,name="order"),
     path('mycard/',views.mycard,name="mycard"),
     path('delcard/',views.delitemfromcard,name="delitemfromcard"),
+    path('ownerproduct/',views.owenerProduct,name='ownerproduct'),
+    path('edit/',views.editItem,name='editItem'),
     path('delfromcard/',views.delonefromcard,name="delonefromcard"),
     path('del_after_buy/',views.del_after_buy,name="del_after_buy"),
     # path('rate/<int:id>/',views.ratingItem,name="ratingItem"), 
@@ -34,6 +35,3 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
    
-
-#get error with path include
-#urlpatterns = format_suffix_patterns(urlpatterns)
