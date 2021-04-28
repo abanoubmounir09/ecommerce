@@ -149,7 +149,6 @@ def addp(request):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
     if  request.user:
-        print("*********user********",request.data)
         userId=request.data['userid']
         file=request.data['cover']       
         PRDName=request.data['PRDName']
@@ -160,7 +159,16 @@ def addp(request):
         PRDDiscountPrice = request.data['PRDDiscountPrice']
         PRDCost = request.data['PRDCost']
         PRDQuantity= request.data['PRDQuantity']
-        catob = Category.objects.get(CATName=PRDCategory) 
+
+        newcat=request.data['newcat']
+        catob = Category.objects.get(CATName=PRDCategory)
+        obj=Product()
+        if newcat :
+            objcat=Category()
+            objcat.CATName=newcat
+            objcat.save()
+            catob = Category.objects.get(CATName=newcat)
+        
         obj=Product()
         obj.PRDName=PRDName
         obj.PRDCategory = catob
@@ -180,21 +188,45 @@ def addp(request):
         response={'message':'error in added product'}
         return Response(response,status=status.HTTP_400_BAD_REQUEST)
 
+
 #edit item
 @api_view(['POST'])
 def editItem(request):
     print("*********data********",request.data)
     file=request.data['cover']    
-
     PRDName=request.data['PRDName']
     PRDCategory = request.data['PRDCategory']
     PRDDesc = request.data['PRDDesc']
     PRDImage = file
+
     PRDPrice = request.data['PRDPrice']
     PRDDiscountPrice = request.data['PRDDiscountPrice']
     PRDCost = request.data['PRDCost']
     PRDQuantity= request.data['PRDQuantity']
+    # newcat=request.data['newcat']
+
     catob = Category.objects.get(CATName=PRDCategory)
+
+    
+    # if newcat :
+    #     objcat=Category()
+    #     objcat.CATName=newcat
+    #     objcat.save()
+    # obj=Product()
+    # obj.PRDName=PRDName
+    # obj.PRDCategory = catob
+    # obj.PRDDesc = PRDDesc
+    # obj.PRDImage = PRDImage
+    # obj.PRDPrice = PRDPrice
+    # obj.PRDDiscountPrice = PRDDiscountPrice
+    # obj.PRDCost = PRDCost
+    # obj.PRDQuantity=PRDQuantity
+    # obj.save()
+    # #object from owner product
+    # # user1=User.objects.get(pk=2)
+    # # ownerObject=OwnerProduct.objects.create(OwnerQuantity=PRDQuantity,OwnerUser=user1,OwnerProduct=obj)
+    # return HttpResponse("productadd")
+
 
     item = Product.objects.get(id=request.data['PRDId'])
     item.PRDName=PRDName
@@ -217,18 +249,33 @@ def addtocard(request):
     body = json.loads(body_unicode)
     id = body['pid']
     uid=body['uid']
-    userobj=User.objects.get(id=uid)
-    objproduct=Product.objects.get(id=id)
-    objorder=Order()
-    objorder.order_user=userobj
-
-    objorder.Orderproduct=objproduct
-    objorder.save()
+    q=body['quantity']
+    obj=Order.objects.filter( Orderproduct__id=id,order_user=uid)
+    if not obj:
+        userobj=User.objects.get(id=uid)
+        objproduct=Product.objects.get(id=id)
+        objorder=Order()
+        objorder.order_user=userobj
+        objorder.order_quantity=q
+        objorder.Orderproduct=objproduct
+        objorder.save()
     return HttpResponse("oederdone")
 
 
-
-
+#tiger
+@api_view(['GET', 'POST'])
+def delonefromcard(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    id = body['pid']
+    uid=body['uid']
+    q=body['quantity'] 
+    obj=Order.objects.get( Orderproduct__id=id,order_user=uid)
+    print("sddsdsdsdsd",obj)
+    obj.order_quantity=q
+    obj.save()
+    return HttpResponse("done")
+    
 #tiger
 @api_view(['GET', 'POST'])
 def mycard(request):
@@ -236,20 +283,22 @@ def mycard(request):
     body = json.loads(body_unicode)
     uid=body['uid']
     obj=Order.objects.all().filter(order_user=uid)
-    print("xxxxxxxxxxxxxxmy cardxxxxxxxxxxxxxxxxxxxxxxxxx")
     print(obj)
     print(obj[0].Orderproduct.id)
-    #objorder=obj.Orderproduct__id
     i=0
     data=[]
+    quan=[]
     while(i<len(obj)):
         objproduct = Product.objects.all().filter(id=obj[i].Orderproduct.id)
-    #product=objorder.Orderproduct
         serializer = productSerializer(objproduct, many=True)
         data.append(serializer.data)
+        quan.append(obj[i].order_quantity)
         i=i+1
-
-    return Response(data)
+        
+    dic={}
+    dic['d']=data
+    dic['q']=quan
+    return Response(dic)
 
 
 
