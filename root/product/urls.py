@@ -12,7 +12,6 @@ from . import views
 
 
 urlpatterns = [
-    #path('',include(router.urls)),
     path('snippets/', views.snippet_list,name="snippet_list"),
     path('categories/', views.category_list,name="category_list"),
     path('query/<str:cat>/<str:name>/', views.query_list,name="query_list"),
@@ -27,7 +26,8 @@ urlpatterns = [
     path('ownerproduct/',views.owenerProduct,name='ownerproduct'),
     path('edit/',views.editItem,name='editItem'),
     path('delfromcard/',views.delonefromcard,name="delonefromcard"),
-    
+    path('del_after_buy/',views.del_after_buy,name="del_after_buy"),
+    path('ownerproduct/',views.owenerProduct,name='ownerproduct')
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

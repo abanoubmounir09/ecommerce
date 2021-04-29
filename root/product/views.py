@@ -90,7 +90,9 @@ def productbyid(request,id):
     print("*************in detais requested user is/////////////// ",request.user)
     snippets = Product.objects.filter(id=id)
     #another query retuen rating from table Rating
+   
     serializer = productSerializer(snippets, many=True)
+    print("qqqqqqq",serializer.data)
     return Response(serializer.data)
 
 # create get api categories
@@ -146,9 +148,9 @@ def rate_product(request,id=None):
 #add product in tow tables owner and product
 @api_view(['POST'])
 def addp(request):
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
-    if  request.user:
+    # authentication_classes = (TokenAuthentication,)
+    # permission_classes = (IsAuthenticated,)
+    if  request.data['userid']:
         userId=request.data['userid']
         file=request.data['cover']       
         PRDName=request.data['PRDName']
@@ -159,19 +161,29 @@ def addp(request):
         PRDDiscountPrice = request.data['PRDDiscountPrice']
         PRDCost = request.data['PRDCost']
         PRDQuantity= request.data['PRDQuantity']
-
         newcat=request.data['newcat']
-        catob = Category.objects.get(CATName=PRDCategory)
+
+        print("*******reuest data**********",request.data)
+
+        if PRDCategory != 'null' :
+            realcategory = Category.objects.get(CATName=PRDCategory)
+
         obj=Product()
+
         if newcat :
-            objcat=Category()
-            objcat.CATName=newcat
-            objcat.save()
             catob = Category.objects.get(CATName=newcat)
-        
-        obj=Product()
+            if catob is None:
+                objcat=Category()
+                objcat.CATName=newcat
+                catob = Category.objects.get(CATName=newcat)
+                objcat.save()
+               
+            print("*****************",catob)
+            obj.PRDCategory = catob
+        else:
+            obj.PRDCategory = realcategory
+
         obj.PRDName=PRDName
-        obj.PRDCategory = catob
         obj.PRDDesc = PRDDesc
         obj.PRDImage = PRDImage
         obj.PRDPrice = PRDPrice
@@ -247,6 +259,7 @@ def editItem(request):
 def addtocard(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
+    print("bodyyyy",body)
     id = body['pid']
     uid=body['uid']
     q=body['quantity']
@@ -271,7 +284,6 @@ def delonefromcard(request):
     uid=body['uid']
     q=body['quantity'] 
     obj=Order.objects.get( Orderproduct__id=id,order_user=uid)
-    print("sddsdsdsdsd",obj)
     obj.order_quantity=q
     obj.save()
     return HttpResponse("done")
@@ -283,6 +295,9 @@ def mycard(request):
     body = json.loads(body_unicode)
     uid=body['uid']
     obj=Order.objects.all().filter(order_user=uid)
+    
+
+    #objorder=obj.Orderproduct__id
     print(obj)
     print(obj[0].Orderproduct.id)
     i=0
@@ -299,6 +314,35 @@ def mycard(request):
     dic['d']=data
     dic['q']=quan
     return Response(dic)
+
+
+
+
+#tiger
+@api_view(['POST'])
+def del_after_buy(request):
+
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    uid=body['uid']
+    i=0
+    obj=Order.objects.all().filter(order_user=uid)
+    print("order obj",obj)
+    while(i<len(obj)):
+        q=obj[i].order_quantity
+        d=obj[i].Orderproduct.id
+        objproduct=Product.objects.get(id=d)
+        objproduct.PRDQuantity=objproduct.PRDQuantity-q
+
+        objowner=OwnerProduct.objects.get(Ownerproduct=d)
+        objowner.OwnerQuantity=objowner.OwnerQuantity-q
+        
+        i=i+1
+        objproduct.save()
+        objowner.save()
+    obj.delete()    
+    return HttpResponse("done")    
+        
 
 
 
