@@ -89,3 +89,8 @@ class OwnerProduct(models.Model):
     Ownerproduct = models.ForeignKey(Product ,on_delete=models.CASCADE , verbose_name=_("OwnerProduct"),related_name='tracks')
     OwnerQuantity= models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(100)],null=True,default=None)
     
+
+class Favorite(models.Model):
+     FAVproduct = models.ForeignKey(Product , on_delete=models.CASCADE, verbose_name=_("productref"), blank=True, null=True )
+     Favorite_user=models.ForeignKey(User, on_delete=models.CASCADE , blank=True, null=True)
+     

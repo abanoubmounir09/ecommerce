@@ -19,3 +19,7 @@ print(token.key)
 pip install django-cors-headers
 pip install djangorestframework
 pip install django-rest-knox
+--------------
+angular
+npm i creditcardpayments
+npm i ngx-pagination

@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse,Http404
 from django.core.paginator import Paginator
-from .models import Product,Category,Rating,Order,OwnerProduct
+from .models import Product,Category,Rating,Order,OwnerProduct,Favorite
 from .forms import addproductform
 #auth
 from knox.auth import TokenAuthentication
@@ -170,15 +170,15 @@ def addp(request):
 
         obj=Product()
 
-        if newcat :
-            catob = Category.objects.get(CATName=newcat)
-            if catob is None:
+        if newcat:
+            catob = Category.objects.filter(CATName=newcat)
+            if (len(catob)<=0):
                 objcat=Category()
                 objcat.CATName=newcat
-                catob = Category.objects.get(CATName=newcat)
                 objcat.save()
-               
-            print("*****************",catob)
+                catob = Category.objects.get(CATName=newcat)
+                obj.PRDCategory = catob
+                
             obj.PRDCategory = catob
         else:
             obj.PRDCategory = realcategory
@@ -200,6 +200,62 @@ def addp(request):
         response={'message':'error in added product'}
         return Response(response,status=status.HTTP_400_BAD_REQUEST)
 
+# #add product in tow tables owner and product
+# @api_view(['POST'])
+# def addp(request):
+#     # authentication_classes = (TokenAuthentication,)
+#     # permission_classes = (IsAuthenticated,)
+    
+#     userId=request.data['userid']
+#     file=request.data['cover']       
+#     PRDName=request.data['PRDName']
+#     PRDCategory = request.data['PRDCategory']
+#     PRDDesc = request.data['PRDDesc']
+#     PRDImage = file
+#     PRDPrice = request.data['PRDPrice']
+#     PRDDiscountPrice = request.data['PRDDiscountPrice']
+#     PRDCost = request.data['PRDCost']
+#     PRDQuantity= request.data['PRDQuantity']
+#     newcat=request.data['newcat']
+
+#     print("*******reuest data**********",request.data)
+#     obj=Product()
+
+#     if PRDCategory != 'null' :
+#         print("***PRDCategory/////////",PRDCategory)
+#         realcategory = Category.objects.get(CATName=PRDCategory)
+#         obj.PRDCategory = realcategory
+
+#     elif  newcat != 'undefined' :
+#         try:
+#             print("***from try if catob/////////",catob)
+#             catob = Category.objects.get(CATName=newcat)
+#             obj.PRDCategory = catob
+#         except:
+#             objcat=Category()
+#             objcat.CATName=newcat
+#             objcat.save()
+#             # catob = Category.objects.get(CATName=newcat)
+#             # print("***from if catob/////////",catob)
+#             obj.PRDCategory__CATName = newcat    
+
+#     obj.PRDName=PRDName
+#     obj.PRDDesc = PRDDesc
+#     obj.PRDImage = PRDImage
+#     obj.PRDPrice = PRDPrice
+#     obj.PRDDiscountPrice = PRDDiscountPrice
+#     obj.PRDCost = PRDCost
+#     obj.PRDQuantity=PRDQuantity
+#     obj.save()
+#     #object from owner product
+#     user1=User.objects.get(pk=userId)
+#     ownerObject=OwnerProduct.objects.create(OwnerQuantity=PRDQuantity,OwnerUser=user1,Ownerproduct=obj)
+#     esponse={'message':'product added'}
+#     # return Response(response,status=status.HTTP_200_OK)
+#     # else:
+#     response={'message':'error in added product'}
+#     return Response(response,status=status.HTTP_400_BAD_REQUEST)
+
 
 #edit item
 @api_view(['POST'])
@@ -218,26 +274,6 @@ def editItem(request):
     # newcat=request.data['newcat']
 
     catob = Category.objects.get(CATName=PRDCategory)
-
-    
-    # if newcat :
-    #     objcat=Category()
-    #     objcat.CATName=newcat
-    #     objcat.save()
-    # obj=Product()
-    # obj.PRDName=PRDName
-    # obj.PRDCategory = catob
-    # obj.PRDDesc = PRDDesc
-    # obj.PRDImage = PRDImage
-    # obj.PRDPrice = PRDPrice
-    # obj.PRDDiscountPrice = PRDDiscountPrice
-    # obj.PRDCost = PRDCost
-    # obj.PRDQuantity=PRDQuantity
-    # obj.save()
-    # #object from owner product
-    # # user1=User.objects.get(pk=2)
-    # # ownerObject=OwnerProduct.objects.create(OwnerQuantity=PRDQuantity,OwnerUser=user1,OwnerProduct=obj)
-    # return HttpResponse("productadd")
 
 
     item = Product.objects.get(id=request.data['PRDId'])
@@ -272,6 +308,25 @@ def addtocard(request):
         objorder.order_quantity=q
         objorder.Orderproduct=objproduct
         objorder.save()
+    return HttpResponse("oederdone")
+
+
+#add to favoriteItem-----------------------------
+@api_view(['GET', 'POST'])
+def favoriteItem(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    print("bodyyyy",body)
+    id = body['pid']
+    uid=body['uid']
+    obj=Favorite.objects.filter( FAVproduct__id=id,Favorite_user=uid)
+    if not obj:
+        userobj=User.objects.get(id=uid)
+        objproduct=Product.objects.get(id=id)
+        FAV_item=Favorite()
+        FAV_item.FAVproduct=objproduct
+        FAV_item.Favorite_user=userobj
+        FAV_item.save()
     return HttpResponse("oederdone")
 
 
@@ -379,10 +434,39 @@ def owenerProduct(request):
         response={'message':'user no product'}
         return Response(response,status=status.HTTP_200_OK)
     
-   
+#getFavoriteItems
+@api_view(['POST'])
+def getFavoriteItems(request):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    if request.data['uid']:
+        favorite_items=Favorite.objects.filter(Favorite_user=request.data['uid'])
+        if(len(favorite_items)>0):
+            op=favorite_items[0].Favorite_user.pk
+            productarr=[]
+            i=0
+            while (i<len(favorite_items)):
+                filteredproduct=Product.objects.get(pk=favorite_items[i].FAVproduct.pk)
+                productarr.append(filteredproduct)
+                i+=1
+            serializer =productSerializer(productarr, many=True)
+            print("------serializer.data-------",serializer.data)
+            return Response(serializer.data)
+    else:
+        response={'message':'user no product'}
+        return Response(response,status=status.HTTP_200_OK)
 
 
-
+#deletFavoriteItem
+@api_view(['GET', 'POST'])
+def deletFavoriteItem(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    uid = body['uid']
+    itemId=body['itemId']
+    obj=Favorite.objects.all().filter(FAVproduct=itemId,Favorite_user=uid)
+    obj.delete()
+    return HttpResponse("item deleted")
 
    
 
