@@ -61,6 +61,7 @@ class LoginAPI(KnoxLoginView):
         temp_list.data["email"]=activeuser.email
         temp_list.data["id"]=activeuser.pk
         temp_list.data["username"]=activeuser.username
+        temp_list.data["last_login"]=activeuser.last_login
         return Response({"data":temp_list.data})
 
 

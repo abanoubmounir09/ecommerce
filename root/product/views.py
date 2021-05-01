@@ -145,7 +145,9 @@ def rate_product(request,id=None):
         response={'message':'You need to provide stars'}
         return Response(response,status=status.HTTP_400_BAD_REQUEST)
 
-#add product in tow tables owner and product
+
+
+  #add product in tow tables owner and product
 @api_view(['POST'])
 def addp(request):
     # authentication_classes = (TokenAuthentication,)
@@ -170,15 +172,15 @@ def addp(request):
 
         obj=Product()
 
-        if newcat :
-            catob = Category.objects.get(CATName=newcat)
-            if catob is None:
+        if newcat:
+            catob = Category.objects.filter(CATName=newcat)
+            if (len(catob)<=0):
                 objcat=Category()
                 objcat.CATName=newcat
-                catob = Category.objects.get(CATName=newcat)
                 objcat.save()
-               
-            print("*****************",catob)
+                catob = Category.objects.get(CATName=newcat)
+                obj.PRDCategory = catob
+                
             obj.PRDCategory = catob
         else:
             obj.PRDCategory = realcategory
@@ -199,6 +201,8 @@ def addp(request):
     else:
         response={'message':'error in added product'}
         return Response(response,status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 #edit item
