@@ -27,7 +27,10 @@ urlpatterns = [
     path('edit/',views.editItem,name='editItem'),
     path('delfromcard/',views.delonefromcard,name="delonefromcard"),
     path('del_after_buy/',views.del_after_buy,name="del_after_buy"),
-    path('ownerproduct/',views.owenerProduct,name='ownerproduct')
+    path('ownerproduct/',views.owenerProduct,name='ownerproduct'),
+    path('favoriteItem/',views.favoriteItem,name='favoriteItem'),
+    path('getFavoriteItems/',views.getFavoriteItems,name='getFavoriteItems'),
+    path('deletFavoriteItem/',views.deletFavoriteItem,name='deletFavoriteItem'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
